@@ -3,21 +3,24 @@ var languageButtonsEl = document.querySelector('#language-buttons'); //buttons t
 var locationInputEl = document.querySelector('#location');
 var repoContainerEl = document.querySelector('#repos-container');
 var repoSearchTerm = document.querySelector('#repo-search-term'); // name that comes after "weather forecaast for:"
+var apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6"
+var lat = "-37.81373321550253"
+var lon = "144.96284987796403"
 
 //-------------------------------//
 //- Prepare request by location -//
 //-------------------------------//
 
 function formSubmitHandler(event) {  
-  console.log("")
-  console.log("> formSubmitHandler() Called")   
+  console.log("\n\n\n > formSubmitHandler() Called")   
   event.preventDefault();
   var location = locationInputEl.value.trim();   // declare local var "location" = value in location search field
   console.log("  Location captured is: " + location);
   
    if (location) {              //if location is truthy then execute code block
     console.log("Location is truthy"); 
-    locationForecast(location);     //location 
+    //locationForecast(location);     //location 
+    fetchCoordinates(location);     //location 
      repoContainerEl.textContent = '';  //clear repo container (list of forecast)
      locationInputEl.value = '';       //clear location search field
    } else {
@@ -30,31 +33,57 @@ function formSubmitHandler(event) {
 //- Prepare request by language -//
 //-------------------------------//
 function buttonClickHandler (event) {
-  console.log("")
-  console.log("> buttonClickHandler() Called")  
+  console.log("\n\n\n > buttonClickHandler() Called")  
   var language = event.target.getAttribute('data-language');  // declare local var "language" = data-language value of element that triggered
 
-  if (language) {     // if language is truthy then carry out the block
-    getFeaturedRepos(language);   // execute getFeaturedRepos wit
+  if (language) {                     // if language is truthy then carry out the block
+    getFeaturedRepos(language);       // execute getFeaturedRepos wit
     repoContainerEl.textContent = ''; //clear any existing repo/weather forecast displayed.
   }
 };
 
-//------------------------------//
-//- Fetch Forecast by Location -//
-//------------------------------//
+//----------------------------------------//
+//- Fetch co-ordinates by location -//
+//----------------------------------------//
+function fetchCoordinates (location) {
+  console.log ("\n\n\n > coordinates() called")
+  var apiCoordinates = "http://api.openweathermap.org/geo/1.0/direct?q="+ location + "&limit=5&appid=" + apiKey;     // to get longitude/latitude info
+  console.log(" fetching coordinates")
+  fetch(apiCoordinates)
+    .then(function (response) {
+      console.log(" function response initiating")
+      if (response.ok) {
+        console.log("response OK");
+        response.json()
+        .then(function (data) {
+          console.log(data);
+          //displayRepos(data,location);
+          lat = data[0].lat;
+          lon = data[0].lon
+          fetchForecast();
+        });
+      } else {
+        alert('Error in co-ordinates: ' + response.statusText);
+      }
+    })
+    .catch(function (error) {
+      alert('Unable to connect to Openweathermap Geolocation');
+    });
+};
 
-function locationForecast (location) {
-  console.log("")
-  console.log("> locationForecast() Called")
-  console.log(" Declaring apiURL ")
-  var apiUrl = "http://api.openweathermap.org/data/2.5/forecast?q=Fukuoka&appid=ebe9a8cb2cc6f41abc680b652e9804b6&unit=metric"
+//----------------------------------//
+//- Fetch Forecast by co-ordinates -//
+//----------------------------------//
+
+function fetchForecast () {
+  console.log("\n\n\n > locationForecast() Called")
+  console.log(" Declaring apiURL ")  
   
-  //var apiUrl = "http://api.openweathermap.org/data/2.5/forecast?lat=-37.81373321550253&lon=144.96284987796403&appid=ebe9a8cb2cc6f41abc680b652e9804b6&units=metric&cnt=40"
-  //var apiUrl = "https://api.openweathermap.org/data/3.0/onecall?lat=-37.81373321550253&lon=144.96284987796403&exclude=minutely,hourly,alerts,current&appid=ebe9a8cb2cc6f41abc680b652e9804b6&units=metric"
+  var apiForecast = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&units=metric&cnt=40&appid=" + apiKey
+  
   
   console.log(" fetching ")
-  fetch(apiUrl)
+  fetch(apiForecast)
     .then(function (response) {
       console.log(" function response initiating")
       if (response.ok) {
@@ -65,11 +94,11 @@ function locationForecast (location) {
           displayRepos(data,location);
         });
       } else {
-        alert('Error: ' + response.statusText);
+        alert('Error in forecast: ' + response.statusText);
       }
     })
     .catch(function (error) {
-      alert('Unable to connect to Openweathermap');
+      alert('Unable to connect to Openweathermap forecast');
     });
 };
 
@@ -77,8 +106,7 @@ function locationForecast (location) {
 //- Fetch Repos by Language -//
 //---------------------------//
 function getFeaturedRepos (language) {
-  console.log("")
-  console.log("> getFeaturedRepos() Called")  
+  console.log("\n\n\n > getFeaturedRepos() Called")  
   var apiUrl = 'https://api.github.com/search/repositories?q=' + language + '+is:featured&sort=help-wanted-issues';
 
   fetch(apiUrl)  //fetch URL above
@@ -104,8 +132,7 @@ function getFeaturedRepos (language) {
 //- Populate Repo container -//
 //---------------------------//
 function displayRepos (openweather, searchTerm) {
-  console.log("");
-  console.log("> displayRepos() Called");
+  console.log("\n\n\n > displayRepos() Called");
   console.log("openweather = ");
   console.log(openweather);
   console.log("Search Term = '" + searchTerm + "'");
@@ -149,8 +176,7 @@ function displayRepos (openweather, searchTerm) {
 //-----------------------------------------------//
 
 locationFormEl.addEventListener('submit', function(event) {
-  console.log("");
-  console.log("! userFormEl Clicked");  
+  console.log("\n\n\n ! userFormEl Clicked");  
   formSubmitHandler(event);
 })
 
@@ -160,7 +186,6 @@ locationFormEl.addEventListener('submit', function(event) {
 //----------------------------------------------------//
 
 languageButtonsEl.addEventListener('click', function(event) {
-  console.log("");
-  console.log("! languageButtonsEl Clicked");  
+  console.log("\n\n\n ! languageButtonsEl Clicked");  
   buttonClickHandler(event);
 });
