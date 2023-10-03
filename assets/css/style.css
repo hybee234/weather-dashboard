@@ -138,10 +138,13 @@ p {
   border-radius: var(--border-radius);
 }
 
-#repos-container {
+
+
+#forecast-container {
 
   display: flex;
-  flex: inline-block;
+  flex-wrap: wrap;
+  flex: 1 1 200px;
 }
 
 

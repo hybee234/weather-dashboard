@@ -1,7 +1,7 @@
 var locationFormEl = document.querySelector('#location-form');
 var languageButtonsEl = document.querySelector('#language-buttons'); //buttons to select JS, HTML, CSS
 var locationInputEl = document.querySelector('#location');
-var repoContainerEl = document.querySelector('#repos-container');
+var forecastContainerEl = document.querySelector('#forecast-container');
 var repoSearchTerm = document.querySelector('#repo-search-term'); // name that comes after "weather forecaast for:"
 var apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6"
 var lat = "-37.81373321550253"
@@ -21,7 +21,7 @@ function formSubmitHandler(event) {
     console.log("Location is truthy"); 
     //locationForecast(location);     //location 
     fetchCoordinates(location);     //location 
-     repoContainerEl.textContent = '';  //clear repo container (list of forecast)
+     forecastContainerEl.textContent = '';  //clear repo container (list of forecast)
      locationInputEl.value = '';       //clear location search field
    } else {
     console.log("Location is falsy")  
@@ -38,7 +38,7 @@ function buttonClickHandler (event) {
 
   if (language) {                     // if language is truthy then carry out the block
     getFeaturedRepos(language);       // execute getFeaturedRepos wit
-    repoContainerEl.textContent = ''; //clear any existing repo/weather forecast displayed.
+    forecastContainerEl.textContent = ''; //clear any existing repo/weather forecast displayed.
   }
 };
 
@@ -69,6 +69,7 @@ function fetchCoordinates (location) {
     .catch(function (error) {
       alert('Unable to connect to Openweathermap Geolocation');
     });
+  
 };
 
 //----------------------------------//
@@ -138,7 +139,7 @@ function displayRepos (openweather, searchTerm) {
   console.log("Search Term = '" + searchTerm + "'");
   
   if (openweather.length === 0) {
-    repoContainerEl.textContent = 'No weather forcasts found.';
+    forecastContainerEl.textContent = 'No weather forcasts found.';
     return;
   }
 
@@ -167,7 +168,7 @@ function displayRepos (openweather, searchTerm) {
     // }
 
     repoEl.appendChild(statusEl);
-    repoContainerEl.appendChild(repoEl);
+    forecastContainerEl.appendChild(repoEl);
   }
 };
 
