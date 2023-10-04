@@ -175,9 +175,10 @@ function displayForecast () {
 // for loop to create forcast text, create 3 HTML elements and append
   for (var i = 0; i < 50 || i < forecastDataArray.length; i = i+8) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
     
-                            // Declare var AEDT store date/time convert from Unix to AEDT
+    // Declare var AEDT store date/time convert from Unix to AEDT
     var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // TO DO *** Can remove time at the end
-                           // Declare weatherForecast variable and store weather forecast text 
+    
+    // Declare weatherForecast variable and store weather forecast text 
     var forecastText = i + ". City: " + forecastDataArray.city.name + ", Date/Time: " + AEDT + " AEDT , Temp: " + forecastDataArray.list[i].main.temp + ", Min: " + forecastDataArray.list[i].main.temp_min + ", Max: " + forecastDataArray.list[i].main.temp_max;  //build the forecst
     console.log(forecastText);
         
