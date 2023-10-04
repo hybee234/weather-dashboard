@@ -2,15 +2,17 @@ var searchFormEl = document.querySelector('#search-form');
 var languageButtonsEl = document.querySelector('#language-buttons'); //buttons to select JS, HTML, CSS
 var searchInputEl = document.querySelector('#search-field');
 var forecastContainerEl = document.querySelector('#forecast-container');
-var subtitleTermEl = document.querySelector('#repo-search-term'); // name that comes after "weather forecaast for:"
+var locationSpanEl = document.querySelector('#location-display'); // name that comes after "weather forecaast for:"
 
 var apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6";
-var lat = "-37.81373321550253";
-var lon = "144.96284987796403";
-
+var lat = "-37.81373321550253";   // latitude to be populated by co-ordinate API (Default is Melbourne)
+var lon = "144.96284987796403";   // longitude to be populated by co-ordinate API (Default is Melbourne)
 var search = ""
-var coordDataArray = [];
+var coordDataArray = [];          // Object to store coordinate API data returned
 var forecastDataArray = [];
+var nameAPI = "" // to store city name from API
+var stateAPI = ""  //to store state name from API
+var countryAPI = "" // to store Country code value from API
 
 //------------------------------//
 //- Check if location is empty -//
@@ -19,7 +21,7 @@ var forecastDataArray = [];
 function checkSearchEmpty(event) {  
   console.log("\n\n\n > checkSearchEmpty() Called");   
   event.preventDefault();
-  search = searchInputEl.value.trim();         // Set value of global var "location" = value in search field (trimmed)
+  search = searchInputEl.value.trim().toLowerCase();         // Set value of global var "location" = value in search field (trimmed and lowercase)
   console.log("  search captured is: " + search);  
    if (search !=="") {                           //if search is truthy then execute code block
      console.log("   search not empty - Good"); 
@@ -66,13 +68,25 @@ function fetchCoordinates () {
         if ( coordData.length === 0 ) {
           alert ('No location found - please try again')
         } else {
-          coordDataArray = [];
+          coordDataArray = [];    // blank out this array to start afresh 
           for (let i=0; i < coordData.length; i++) {coordDataArray.push(coordData[i]) }; // for loop to push coordData values one at a time into coordDataArray global object
           console.log("Coordinate API data pushed into global object")
           console.log(coordDataArray)
-          lat = coordData[0].lat;
-          lon = coordData[0].lon;          
-          console.log("  coordData[0] values\n  -------------------\n  Lat: " + coordData[0].lat + "\n  Lon: " + coordData[0].lon + "\n  Country: " + coordData[0].country+ "\n  Name: " + coordData[0].name+ "\n  State: " + coordData[0].state);
+          lat = coordDataArray[0].lat;
+          lon = coordDataArray[0].lon;          
+          nameAPI = coordDataArray[0].name;
+          countryAPI = coordDataArray[0].country;
+          stateAPI = coordDataArray[0].state;
+          console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + lat + "\n  Lon: " + lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
+         //Prepare string variable for subtitle
+          
+  
+  //If value of state returned by API is equal to underfined, then hide the state
+  // if (coordDataArray[0].state = "undefined") {
+  //   var stateAPI = ""
+  // } else {
+  //   var stateAPI = coordDataArray[0].state + ", ";
+  // }
           fetchForecast();
         }
       });
@@ -99,13 +113,12 @@ function fetchForecast () {
       console.log("  Forecast API Response OK");
       console.log("  Storing response in forecastData object");
       response.json().then(function (forecastData) {  //store API reponse in "forecastData" JSON object
-      console.log("Response from from forecast API:")
+      console.log("  Response from from forecast API:")
       console.log(forecastData);
 
-      for (let i=0; i < forecastData.list.length; i++) {forecastDataArray.push(forecastData.list[i]) }; // for loop to push coordData values one at a time into coordDataArray global object
-      console.log("forecast API data pushed into global object")
-      console.log(forecastDataArray)
-
+      // for (let i=0; i < forecastData.list.length; i++) {forecastDataArray.push(forecastData.list[i]) }; // for loop to push coordData values one at a time into coordDataArray global object
+      // console.log("forecast API data pushed into global object")
+      // console.log(forecastDataArray)
 
       displayForecast(forecastData,search);
       });
@@ -116,6 +129,7 @@ function fetchForecast () {
   .catch(function (error) {
     alert('Unable to connect to Openweathermap forecast');
   });
+  console.log("coordDataArray State = " + coordDataArray.state);
   return;
 };
 
@@ -145,27 +159,34 @@ function fetchForecast () {
 //   });
 // };
 
-//---------------------------//
-//- Display Forecaset Repo container -//
-//---------------------------//
-function displayForecast (forecastData, search) {
+//---------------------//
+//- Display Forecaset -//
+//---------------------//
+function displayForecast (forecastData, search) {  //receive parameters passed through when this function was called (In this case it is the forecastData API and search term entered by the user)
   console.log("\n\n\n > displayForecast() Called");
   console.log("  forecastData = ");
   console.log(forecastData);
-  console.log("  search = '" + search + "'"); 
- //Checking if forecastData has zero length (i.e. no values)
+  console.log("  search term used = '" + search + "'"); 
+  //Checking if forecastData has zero length (i.e. no values)
   if (forecastData.length === 0) {
     forecastContainerEl.textContent = 'No weather forcasts found.';
     return;
+  } 
+  //Updating subtitle text to show city, state, country of weather forecast
+  if (stateAPI = "undefined") {
+    locationSpanEl.textContent = nameAPI + ", " + countryAPI;
+  } else {
+    locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI;
   }
+  console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
 
-                       // Set title to include location "Weather forecast for" - why is the location the web address? When did this change?
-  
-subtitleTermEl.textContent = forecastData.city.name + ", " + coordDataArray[0].state + ", " + forecastData.city.country;
-console.log ("coordDataArray")
-console.log (coordDataArray);
+  // Compare "search" and "city" name returned in API" for a match (if no match then a nearby location has been selected based on co-ordinates)
+  // console.log("  checking if search term and cityAPI match:")
+  // if (nameAPI.trim().toLowerCase() === search) {}
+  console.log ("  coordDataArray\n--------------")
+  console.log (coordDataArray);
 
-                        // for loop to create forcast text, create 3 HTML elements and append
+// for loop to create forcast text, create 3 HTML elements and append
   for (var i = 0; i < 20; i++) {
     
                             // Declare var AEDT store date/time convert from Unix to AEDT
