@@ -7,9 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   
   <link rel="stylesheet" href="./assets/css/reset.css" />
-  <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,400i,700&display=swap" rel="stylesheet"> <!--google font-->
-  <script src="https://kit.fontawesome.com/80af804818.js" crossorigin="anonymous"></script> <!--fontawesome icons-->
-
+  <!--<script src="https://kit.fontawesome.com/80af804818.js" crossorigin="anonymous"></script>--> <!--fontawesome icons-->
   <link rel="stylesheet" href="./assets/css/style.css" />
   
   <title>Huber Weather Dashborad</title>
@@ -24,15 +22,14 @@
     </p>
   </header>
 
-
   <main class="flex-row justify-space-between">
     <div class="col-12 col-md-4">
 
       <div class="card">
         <h3 class="card-header text-uppercase">Weather Forecast By City</h3>
-        <form id="location-form" class="card-body">
-          <label class="form-label" for="location">Location</label>
-          <input name="location" id="location" type="text" autofocus="true" class="form-input" />
+        <form id="search-form" class="card-body">
+          <label class="form-label" for="search">Search for city</label>
+          <input name="search" id="search-field" type="text" autofocus="true" class="form-input" /> <!-- Location Field -->
           <button type="submit" class="btn">Get forecast</button>
         </form>
       </div>
@@ -53,6 +50,12 @@
     </div>
   </main>
 
+
+  <!-- Link the DayJS library (from day.js.org) -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script>dayjs().format()</script>
+   
+  <!-- Link local Javascript -->
   <script src="./assets/js/script.js"></script>
 </body>
 
