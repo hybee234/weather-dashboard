@@ -141,7 +141,9 @@ p {
   border-radius: var(--border-radius);
 }
 
-
+.forecast-card {
+  border: 2px solid blacK;
+}
 
 #forecast-container {
 
