@@ -24,14 +24,13 @@ function checkSearchEmpty(event) {
   search = searchInputEl.value.trim().toLowerCase();         // Set value of global var "location" = value in search field (trimmed and lowercase)
   console.log("  search captured is: " + search);  
    if (search !=="") {                           //if search is truthy then execute code block
-     console.log("   search not empty - Good"); 
+     console.log("  search not empty - Good"); 
      forecastContainerEl.textContent = '';         //clear forecast container (list of forecast)
      searchInputEl.value = '';                    //clear search field
      fetchCoordinates();                      // Use named location to fetch co-ordinates to use in the weather forecast API
    } else {
-    console.log("   search is empty - bad")  
-    alert('Please enter a location');        //if location is falsy then request location
-    
+    console.log("  search is empty - bad")  
+    alert('Please enter a location');        //if location is falsy then request location    
    };
    return;
 };
@@ -53,50 +52,39 @@ function checkSearchEmpty(event) {
 // - Fetch co-ordinates by location -//
 // ----------------------------------//
 function fetchCoordinates () {
-  console.log ("\n\n\n > coordinates() called")
-  var apiCoordinates = "http://api.openweathermap.org/geo/1.0/direct?q="+ search + "&limit=5&appid=" + apiKey;     // to get longitude/latitude info
-  console.log("  fetching coordinates")
-  fetch(apiCoordinates).then(function (response) {      
-    if (response.ok) {
-      console.log("  Coordinates API Response OK");
-      console.log("  Storing response in coordData object");
-      response.json().then(function (coordData) {   //store API reponse in "coordData" JSON object
-      console.log("Response from from coordinates API:")
-      console.log(coordData);
-        //displayRepos(data,search);
-        //If the "data" array is zero length (i.e. no location found) then present alert indication this, otherwise assign latitude and longtitude to variables
-        if ( coordData.length === 0 ) {
-          alert ('No location found - please try again')
-        } else {
-          coordDataArray = [];    // blank out this array to start afresh 
-          for (let i=0; i < coordData.length; i++) {coordDataArray.push(coordData[i]) }; // for loop to push coordData values one at a time into coordDataArray global object
-          console.log("Coordinate API data pushed into global object")
-          console.log(coordDataArray)
-          lat = coordDataArray[0].lat;
-          lon = coordDataArray[0].lon;          
-          nameAPI = coordDataArray[0].name;
-          countryAPI = coordDataArray[0].country;
-          stateAPI = coordDataArray[0].state;
-          console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + lat + "\n  Lon: " + lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
-         //Prepare string variable for subtitle
-          
-  
-  //If value of state returned by API is equal to underfined, then hide the state
-  // if (coordDataArray[0].state = "undefined") {
-  //   var stateAPI = ""
-  // } else {
-  //   var stateAPI = coordDataArray[0].state + ", ";
-  // }
-          fetchForecast();
+    console.log ("\n\n\n > fetchCoordinates() called");
+    var apiCoordinates = "http://api.openweathermap.org/geo/1.0/direct?q=" + search + "&limit=5&appid=" + apiKey;     // to get longitude/latitude info
+    console.log("  fetching coordinates from API ...");
+    fetch(apiCoordinates).then(function (response) {      
+        if (response.ok) {
+            console.log("  ... API Response received (see below)");
+            response.json().then(function (coordData) {   //store API reponse temporary in "coordData"
+            console.log(coordData);       // Data from API
+            //If the "data" array is zero length (i.e. no location found) then present alert indication this, otherwise assign latitude and longtitude to variables
+              if ( coordData.length === 0 ) {
+                alert ('No location found - please try again');
+                return;
+              } else {
+                coordDataArray = coordData //store coordData from API into local object "coordDataArray"
+                            //for (let i=0; i < coordData.length; i++) {coordDataArray.push(coordData[i]) }; // for loop to push coordData values one at a time into coordDataArray global object
+                console.log("  Coordinate API data stored in global variable 'coordDataArray'");
+                console.log(coordDataArray);
+                lat = coordDataArray[0].lat;
+                lon = coordDataArray[0].lon;          
+                nameAPI = coordDataArray[0].name;
+                countryAPI = coordDataArray[0].country;
+                stateAPI = coordDataArray[0].state;
+                console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + lat + "\n  Lon: " + lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
+              };
+              fetchForecast();        
+            });
+        } else {                
+            alert('Error in co-ordinates: ' + response.statusText); // Can connect to API server but error sent back
         }
-      });
-    } else {                
-      alert('Error in co-ordinates: ' + response.statusText); // Can connect to API server but error sent back
-    }
-  }).catch(function (error) {  // Error message if cannot connect to API server at all
-    alert('Unable to connect to Openweathermap Geolocation');
-  });
-  return;
+    }).catch(function (error) {  // Error message if cannot connect to API server at all
+        alert('Unable to connect to Openweathermap Geolocation');
+    });
+    return;
 };
 
 //----------------------------------//
@@ -104,33 +92,28 @@ function fetchCoordinates () {
 //----------------------------------//
 
 function fetchForecast () {
-  console.log("\n\n\n > fetchForecast() Called")
-  console.log("  search = " + search)
-  var apiForecast = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&units=metric&cnt=40&appid=" + apiKey
-  console.log("  fetching forecast")  
-  fetch(apiForecast).then(function (response) {      
-    if (response.ok) {
-      console.log("  Forecast API Response OK");
-      console.log("  Storing response in forecastData object");
-      response.json().then(function (forecastData) {  //store API reponse in "forecastData" JSON object
-      console.log("  Response from from forecast API:")
-      console.log(forecastData);
-
-      // for (let i=0; i < forecastData.list.length; i++) {forecastDataArray.push(forecastData.list[i]) }; // for loop to push coordData values one at a time into coordDataArray global object
-      // console.log("forecast API data pushed into global object")
-      // console.log(forecastDataArray)
-
-      displayForecast(forecastData,search);
-      });
-    } else {
-      alert('Error in forecast: ' + response.statusText); // Can connect to API server but error sent back
-    }
-  })
-  .catch(function (error) {
-    alert('Unable to connect to Openweathermap forecast');
-  });
-  console.log("coordDataArray State = " + coordDataArray.state);
-  return;
+    console.log("\n\n\n > fetchForecast() Called")
+    //console.log("  search = " + search)
+    var apiForecast = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&units=metric&cnt=80&appid=" + apiKey;
+    console.log("  fetching forecast from API..");  
+    fetch(apiForecast).then(function (response) {      
+        if (response.ok) {
+            console.log("  ... API Response received (see below)");            
+            response.json().then(function (forecastData) {  //store API reponse temporary in "forecastData"
+            console.log(forecastData);   // Data from API
+                forecastDataArray = forecastData; //store forecastData from API into local object "forecastDataArray"
+                console.log(" Forecast API data stored in global variable 'forecastDataArray'");
+                console.log(forecastDataArray);
+                console.log("StateAPI: " + stateAPI);   //StateAPI check - still showing a good value     
+            displayForecast(); 
+            });
+        } else {
+          alert('Error in forecast: ' + response.statusText); // Can connect to API server but error sent back
+        }
+    }).catch(function (error) {
+       alert('Unable to connect to Openweathermap forecast');
+    });      
+    return;
 };
 
 //---------------------------//
@@ -162,44 +145,50 @@ function fetchForecast () {
 //---------------------//
 //- Display Forecaset -//
 //---------------------//
-function displayForecast (forecastData, search) {  //receive parameters passed through when this function was called (In this case it is the forecastData API and search term entered by the user)
+function displayForecast () {
   console.log("\n\n\n > displayForecast() Called");
-  console.log("  forecastData = ");
-  console.log(forecastData);
+  console.log("  ****TEST StateAPI: " + stateAPI);   //StateAPI check - still showing a good value
   console.log("  search term used = '" + search + "'"); 
-  //Checking if forecastData has zero length (i.e. no values)
-  if (forecastData.length === 0) {
-    forecastContainerEl.textContent = 'No weather forcasts found.';
-    return;
+  
+  //Checking if forecastDataArray has zero length (i.e. no values)
+  if (forecastDataArray.length === 0) {
+    forecastContainerEl.textContent = 'No weather forcasts found.';    
   } 
+  console.log("  ****TEST StateAPI: " + stateAPI);   //StateAPI check
   //Updating subtitle text to show city, state, country of weather forecast
-  if (stateAPI = "undefined") {
-    locationSpanEl.textContent = nameAPI + ", " + countryAPI;
+  if (!stateAPI) { 
+    console.log ("  StateAPI value =" + stateAPI);
+    locationSpanEl.textContent = nameAPI + ", test falsy " + stateAPI + " test falsy" + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;     // Come back to delete the "test falsy and State API values out of this line"
   } else {
-    locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI;
+    locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;
   }
+  console.log("  ****TEST StateAPI: " + stateAPI);   //StateAPI check
+  
   console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
 
   // Compare "search" and "city" name returned in API" for a match (if no match then a nearby location has been selected based on co-ordinates)
   // console.log("  checking if search term and cityAPI match:")
   // if (nameAPI.trim().toLowerCase() === search) {}
-  console.log ("  coordDataArray\n--------------")
+  console.log ("  coordDataArray\n  --------------")
   console.log (coordDataArray);
 
 // for loop to create forcast text, create 3 HTML elements and append
-  for (var i = 0; i < 20; i++) {
+  for (var i = 0; i < 50 || i < forecastDataArray.length; i = i+8) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
     
                             // Declare var AEDT store date/time convert from Unix to AEDT
-    var AEDT = dayjs.unix(forecastData.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');
+    var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // TO DO *** Can remove time at the end
                            // Declare weatherForecast variable and store weather forecast text 
-    var forecastText = i + ". City: " + forecastData.city.name + ", Date/Time: " + AEDT + " AEDT , Temp: " + forecastData.list[i].main.temp + ", Min: " + forecastData.list[i].main.temp_min + ", Max: " + forecastData.list[i].main.temp_max;  //build the forecst
+    var forecastText = i + ". City: " + forecastDataArray.city.name + ", Date/Time: " + AEDT + " AEDT , Temp: " + forecastDataArray.list[i].main.temp + ", Min: " + forecastDataArray.list[i].main.temp_min + ", Max: " + forecastDataArray.list[i].main.temp_max;  //build the forecst
     console.log(forecastText);
         
+    
+    //Build and append containers
+    
     var forecastEl = document.createElement('div');                                       // Declare var forecastEl - create new 'div' element
         forecastEl.classList = 'list-item flex-row justify-space-between align-center';   // Add classes to new 'div' element
 
     var titleEl = document.createElement('span');                                         // Declare var title El - create new 'span' element
-        titleEl.textContent = forecastText;                                            // Add weatherForcast text to the new span element
+        titleEl.textContent = forecastText;                                                // Add weatherForcast text to the new span element
         forecastEl.appendChild(titleEl);                                                  // Append titleEl (child) to forecastEl (parent)
 
     var statusEl = document.createElement('span');                                        // Declare Var statusEl  - create new 'span' element
