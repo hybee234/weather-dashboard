@@ -29,7 +29,8 @@ h4,
 h5,
 h6 {
   font-weight: 700;
-  margin: 0;
+  margin: 0px;
+  padding: 2px;
   color: var(--dark);
   line-height: 1.25;
 }
@@ -103,15 +104,17 @@ p {
   max-width: 75%;
 }
 
+
+/*Heading - Huber's Weather Dashboard*/
 .app-title {
   font-size: 3rem;
   background-color: var(--primary);
   color: var(--dark);
-  padding: 0 10px;
+  padding: 10px 15px 10px 15px;
   display: inline-block;
   border-radius: var(--border-radius);
   box-shadow: 6px 5px var(--light-dark);
-}
+}   
 
 .list-group {
   padding: 0;
