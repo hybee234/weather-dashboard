@@ -44,6 +44,7 @@ p {
   font-size: 1.2rem;
 }
 
+/*Buttons are: Search Javascript html css*/
 .btn {
   font-size: 1.3rem;
   text-decoration: none;
@@ -60,6 +61,7 @@ p {
   transform: translate(-1px, -1px);
 }
 
+/*Buttons are: Search Javascript html css*/
 .btn:hover {
   color: var(--primary);
   background-color: var(--tertiary);
@@ -67,10 +69,12 @@ p {
   box-shadow: 2px 2px var(--dark);
 }
 
+/*Can't find this class in html/js*/
 .btn-inline {
   display: inline;
 }
 
+/*Can't find this class in html/js*/
 .btn-back {
   border-radius: var(--border-radius);
   color: var(--primary);
@@ -87,6 +91,7 @@ p {
   font-size: 1.2rem;
 }
 
+/*Can't find this class in html/js*/
 .btn-back:hover {
   color: var(--primary);
   background-color: var(--tertiary);
@@ -94,16 +99,14 @@ p {
   box-shadow: 2px 2px var(--dark);
 }
 
+/*************************/
+/* header main container */
+/*************************/
 .hero {
   padding: 3% 4%;
   background-color: var(--dark);
   color: var(--primary);
 }
-
-.hero p {
-  max-width: 75%;
-}
-
 
 /*Heading - Huber's Weather Dashboard*/
 .app-title {
@@ -116,11 +119,20 @@ p {
   box-shadow: 6px 5px var(--light-dark);
 }   
 
+.hero p {
+  max-width: 75%;
+}
+
+/*Can't find this class in html and js*/
 .list-group {
   padding: 0;
   list-style: none;
 }
 
+
+
+/* DYNAMICALLY CREATED ELEMENTS */
+/*In JS when forecast is dynamically created and appended*/
 .list-item {
   margin-bottom: 10px;
   padding: 1.5%;
@@ -129,45 +141,42 @@ p {
   color: var(--primary);
   text-decoration: none;
 }
-
+/* DYNAMICALLY CREATED ELEMENTS */
+/*In JS when forecast is dynamically created and appended*/
 .list-item:hover {
   background-color: var(--dark);
 }
 
-.status-icon {
-  padding: 2px 5px;
-  margin: 0 5px;
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: var(--border-radius);
-}
-
-.forecast-card {
-  border: 2px solid blacK;
-}
-
+/* DYNAMICALLY CREATED ELEMENTS */
+/*where JS is dynamiclly adding forecast*/
 #forecast-container {
 
   display: flex;
   flex-wrap: wrap;
   flex: 1 1 200px;
+  background-color: red;
 }
 
 
-.icon-danger {
-  color: rgb(255, 70, 70);
+/*Containers for forcast [HL] you added this in*/
+.forecast-card {
+  
+  border: 2px solid blacK;
+  border-radius: 5px;
+  margin: 5px 5px 5px 5px;
+
 }
 
-.icon-success {
-  color: rgb(29, 153, 255);
-}
 
-/* CARDS */
+/*SEARCH AND HISTORY CONTAINERS*/
+/* 'Search for city' and 'previous search' div containers */
 .card {
   margin: 0 0 20px 0;
   border: 3px solid var(--dark);
   border-radius: var(--border-radius);
 }
 
+/* h3 within div container*/
 .card-header {
   color: var(--primary);
   background-color: var(--dark);
@@ -175,11 +184,13 @@ p {
   border-radius: calc(0.18rem - 1px) calc(0.18rem - 1px) 0 0;
 }
 
+/*container for button/form within div container*/
 .card-body {
   padding: 2.5%;
 }
 
-/* FORM */
+
+/* FORM specific  */
 .form-label,
 .form-input,
 .form-textarea {
@@ -200,32 +211,40 @@ p {
   border-radius: var(--border-radius);
 }
 
+
 /* HEIGHT / WIDTH UTILS */
+
+/*body container*/
 .min-100-vh {
   min-height: 100vh;
 }
 
+/*Not found in JS/HTML*/
 .min-100-vw {
   min-width: 100vw;
 }
 
 /* FONT UTILS */
+/*H3 headings in Search/History elements*/
 .text-uppercase {
   text-transform: uppercase;
 }
 
 /* FLEX CONTENT */
+/*main container*/
 .flex-row {
   display: flex;
   flex-wrap: wrap;
 }
 
+/*body container*/
 .flex-column {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
 }
 
+/*main container*/
 .justify-space-between {
   justify-content: space-between;
 }
