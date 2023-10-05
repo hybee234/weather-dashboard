@@ -201,6 +201,12 @@ function displayForecast () {
   }
 };
 
+
+//list-item = padding, marging colours etc
+// flex-row =  display: flex;   flex-wrap: wrap;
+// align-center = align-items: center;
+// justify-space-between = justify-content: space-between;
+
 //-----------------------------------------------//
 //- Listener to capture click to "Get Forecast" -//
 //-----------------------------------------------//
