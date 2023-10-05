@@ -130,8 +130,9 @@ p {
 }
 
 
-
+/********************************/
 /* DYNAMICALLY CREATED ELEMENTS */
+/********************************/
 /*In JS when forecast is dynamically created and appended*/
 .list-item {
   margin-bottom: 10px;
@@ -140,6 +141,7 @@ p {
   background-color: var(--light-dark);
   color: var(--primary);
   text-decoration: none;
+  
 }
 /* DYNAMICALLY CREATED ELEMENTS */
 /*In JS when forecast is dynamically created and appended*/
@@ -161,9 +163,15 @@ p {
 /*Containers for forcast [HL] you added this in*/
 .forecast-card {
   
-  border: 2px solid blacK;
-  border-radius: 5px;
-  margin: 5px 5px 5px 5px;
+  border: 2px solid black;
+
+
+  margin-bottom: 10px;
+  padding: 1.5%;
+  border-radius: var(--border-radius);
+  background-color: var(--light-dark);
+  color: var(--primary);
+  text-decoration: none;
 
 }
 
@@ -325,6 +333,7 @@ p {
   flex: 0 0 calc(100% * 11 / 12 - 2%);
 }
 
+/*main forecast temperature*/
 .col-12 {
   flex: 0 0 100%;
 }
