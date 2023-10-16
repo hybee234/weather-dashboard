@@ -1,28 +1,28 @@
-var searchFormEl = document.querySelector('#search-form'); 
-var languageButtonsEl = document.querySelector('#language-buttons'); //buttons to select JS, HTML, CSS
-var searchInputEl = document.querySelector('#search-field');
-var forecastContainerEl = document.querySelector('#forecast-container');
-var locationSpanEl = document.querySelector('#location-display'); // name that comes after "weather forecaast for:"
+let searchFormEl = document.querySelector('#search-form'); 
+let languageButtonsEl = document.querySelector('#language-buttons'); //buttons to select JS, HTML, CSS
+let searchInputEl = document.querySelector('#search-field');
+let forecastContainerEl = document.querySelector('#forecast-container');
+let locationSpanEl = document.querySelector('#location-display'); // name that comes after "weather forecaast for:"
 let modalEl =  document.getElementById('modal');                                    // Modal Window
 let modalTitleEl = document.getElementById('modal-title');                         // Modal Title Text
 let modalLineOneEl = document.getElementById('modal-line-one');                    // Modal Pragraph line one
 let modalLineTwoEl = document.getElementById('modal-line-two');                    // Modal Pragraph line two
-let modalOKBtn = document.getElementById('modal-ok')                                // Modal OK button
-let modalCloseBtn = document.getElementById('modal-close')                          // Modal Close button (cross)
+let modalOKBtn = document.getElementById('modal-ok')                               // Modal OK button
+let modalCloseBtn = document.getElementById('modal-close')                         // Modal Close button (cross)
 
-var apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6";
+let apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6";
 var lat = "-37.81373321550253";                   // latitude to be populated by co-ordinate API (Default is Melbourne)
 var lon = "144.96284987796403";                   // longitude to be populated by co-ordinate API (Default is Melbourne)
 var search = ""                                   // search term used
 var coordDataArray = [];                          // Object to store coordinate API data returned
 var forecastDataArray = [];
-var nameAPI = ""                                  // to store city name from API
-var stateAPI = ""                                 //to store state name from API
-var countryAPI = ""                               // to store Country code value from API
+var nameAPI = ""                                  // to store city name from Geolocation API
+var stateAPI = ""                                 // to store state name from Geolocation API
+var countryAPI = ""                               // to store Country code value from Geolocation API
 
-//----------------------------------//
-//- Check if Search Value is empty -//
-//----------------------------------//
+//--------------------------------//
+//- Check if Assess Search Value -//
+//--------------------------------//
 
 function assessSearchValue(event) {  
   console.log("\n\n\n > assessSearchValue() Called");   
@@ -80,19 +80,19 @@ function fetchCoordinates () {
               fetchForecast();        
             });
         } else {                            
-            console.log("  Error in API request - presenting modal alert") //if location is falsy then request location
+            console.log("  Geolocation API Request Error - presenting modal alert") //if location is falsy then request location
             modalEl.style.display = "inline";
-            modalTitleEl.textContent = "Error in request";
-            modalLineOneEl.textContent = "Please review and try again.";
-            modalLineTwoEl.textContent = "Error response: " + response.statusText + ".";
+            modalTitleEl.textContent = "Geolocation API request error";
+            modalLineOneEl.textContent = "The request to the Geolocation server has return an error, please review and try again.";
+            modalLineTwoEl.textContent = "Error response: " + response.statusText + ".";            
         }
     }).catch(function (error) {  // Error message if cannot connect to API server at all
         alert('Unable to connect to Openweathermap Geolocation');
-        console.log("  Cannot connect to API - presenting modal alert") //if location is falsy then request location
+        console.log("  Cannot connect to Geolocation API - presenting modal alert") //if location is falsy then request location
         modalEl.style.display = "inline";
-        modalTitleEl.textContent = "Cannot connect to Server";
-        modalLineOneEl.textContent = "The weather server appears to be offline.";
-        modalLineTwoEl.textContent = "Please try again another time.";
+        modalTitleEl.textContent = "Cannot connect to Geolocation Server";
+        modalLineOneEl.textContent = "The Geolocation server appears to be offline.";
+        modalLineTwoEl.textContent = "Please try again another time.";        
     });
     return;
 };
@@ -102,26 +102,47 @@ function fetchCoordinates () {
 //----------------------------------//
 
 function fetchForecast () {
-    console.log("\n\n\n > fetchForecast() Called")
-    //console.log("  search = " + search)
+    console.log("\n\n\n > fetchForecast() Called")    
+    console.log("Latitude = " + lat)
+    console.log("Longitude = " + lon)
     var apiForecast = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&units=metric&cnt=80&appid=" + apiKey;
     console.log("  fetching forecast from API..");  
     fetch(apiForecast).then(function (response) {      
         if (response.ok) {
             console.log("  ... fetchForecast API Response received");            
             response.json().then(function (forecastData) {  //store API reponse temporary in "forecastData"
-            //console.log(forecastData);   // Data from API
+            
+              if ( forecastData.length === 0 ) {
+                console.log("  No weather forecast data found - presenting modal alert") //if no weather location is available then start again
+                modalEl.style.display = "inline";
+                modalTitleEl.textContent = "No weather forecast available";
+                modalLineOneEl.textContent = "The does not have forecast data for the city of interest";
+                modalLineTwoEl.textContent = "Please try another city";
+                return;
+              } else {    
+            
+              //console.log(forecastData);   // Data from API
                 forecastDataArray = forecastData; //store forecastData from API into local object "forecastDataArray"
                 console.log(" Forecast API data stored in global variable 'forecastDataArray'");
                 console.log(forecastDataArray);
-                console.log("StateAPI: " + stateAPI);   //StateAPI check - still showing a good value     
-            displayForecast(); 
+                //console.log("StateAPI: " + stateAPI);   //StateAPI check - still showing a good value     
+                displayForecast(); 
+              }
+
             });
         } else {
-          alert('Error in forecast: ' + response.statusText); // Can connect to API server but error sent back
+          console.log("  Weather Forecast API request error - presenting modal alert") //if location is falsy then request location
+          modalEl.style.display = "inline";
+          modalTitleEl.textContent = "Weather Forecast Server Request Error";
+          modalLineOneEl.textContent = "The request to the Weather Forecasting server has returned an error - please review and try again.";
+          modalLineTwoEl.textContent = "Error response: " + response.statusText + ".";
         }
     }).catch(function (error) {
-       alert('Unable to connect to Openweathermap forecast');
+      console.log("  Cannot connect to Weather Forecast API - presenting modal alert") //if location is falsy then request location
+      modalEl.style.display = "inline";
+      modalTitleEl.textContent = "Cannot connect to weather forecasting Server";
+      modalLineOneEl.textContent = "The weather forecasting server appears to be offline.";
+      modalLineTwoEl.textContent = "Please try again another time.";
     });      
     return;
 };
@@ -130,33 +151,27 @@ function fetchForecast () {
 //- Display Forecast -//
 //---------------------//
 function displayForecast () {
-  console.log("\n\n\n > displayForecast() Called");
-  console.log("  ****TEST StateAPI: " + stateAPI);   //StateAPI check - still showing a good value
+  console.log("\n\n\n > displayForecast() Called");  
   console.log("  search term used = '" + search + "'"); 
   
-  //Checking if forecastDataArray has zero length (i.e. no values)
-  if (forecastDataArray.length === 0) {
-    forecastContainerEl.textContent = 'No weather forcasts found.';    
-  } 
-  console.log("  ****TEST StateAPI: " + stateAPI);   //StateAPI check
-  //Updating subtitle text to show city, state, country of weather forecast
-  if (!stateAPI) { 
-    console.log ("  StateAPI value =" + stateAPI);
-    locationSpanEl.textContent = nameAPI + ", test falsy " + stateAPI + " test falsy" + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;     // Come back to delete the "test falsy and State API values out of this line"
-  } else {
-    locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;
-  }
-  console.log("  ****TEST StateAPI: " + stateAPI);   //StateAPI check
-  
+  locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;
+     
   console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
 
-  // Compare "search" and "city" name returned in API" for a match (if no match then a nearby location has been selected based on co-ordinates)
-  // console.log("  checking if search term and cityAPI match:")
-  // if (nameAPI.trim().toLowerCase() === search) {}
-  console.log ("  coordDataArray\n  --------------")
-  console.log (coordDataArray);
+//run single loop for "ID = forecast-one" - or assign values to forecast one ... //
+//Or just have HTML there and assign values to first one
 
-// for loop to create forcast text, create 3 HTML elements and append
+
+// for loop to create remaining forecast. 
+// Cards with values:
+// Date
+// Icon
+// Temperature (celcius)
+// Wind (km/h)
+// Humidity (percentage)
+
+
+//forcast text, create 3 HTML elements and append
   for (var i = 0; i < 50 || i < forecastDataArray.length; i = i+1) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
     
     // Declare var AEDT store date/time convert from Unix to AEDT
@@ -166,7 +181,6 @@ function displayForecast () {
     var forecastText = i + ". City: " + forecastDataArray.city.name + ", Date/Time: " + AEDT + " AEDT , Temp: " + forecastDataArray.list[i].main.temp + ", Min: " + forecastDataArray.list[i].main.temp_min + ", Max: " + forecastDataArray.list[i].main.temp_max;  //build the forecst
     console.log(forecastText);
         
-    
     //Build and append containers
     
     var forecastEl = document.createElement('div');                                       // Declare var forecastEl - create new 'div' element
