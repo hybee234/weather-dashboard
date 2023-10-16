@@ -23,7 +23,7 @@ var nameAPI = "";                                  // to store city name from Ge
 var stateAPI = "";                                 // to store state name from Geolocation API
 var countryAPI = "";                               // to store Country code value from Geolocation API
 var previousSearchArray = [];                     // Array to store historical searches (and interact with local storage)
-
+var AEDT = ""                                     // Forecast date converted to AEDT
 //----------------------------------//
 //- Function - Assess Search Value -//
 //----------------------------------//
@@ -53,8 +53,11 @@ var assessSearchValue = event =>  {
 // ---------------------------------------------//
 var fetchCoordinates = () => {
     console.log ("\n\n\n > fetchCoordinates() called");
+    
     var apiCoordinates = "http://api.openweathermap.org/geo/1.0/direct?q=" + searchCity + "&limit=5&appid=" + apiKey;     // to get longitude/latitude info
     console.log("  fetching coordinates from OpenWeather Geocoding API ...");
+    console.log(apiCoordinates);
+
     fetch(apiCoordinates).then(function (response) {      
         if (response.ok) {
             console.log("  ... fetchCoordinates API Response received");
@@ -89,8 +92,7 @@ var fetchCoordinates = () => {
             modalLineOneEl.textContent = "The request to the Geolocation server has return an error, please review and try again.";
             modalLineTwoEl.textContent = "Error response: " + response.statusText + ".";            
         }
-    }).catch(function (error) {  // Error message if cannot connect to API server at all
-        alert('Unable to connect to Openweathermap Geolocation');
+    }).catch(function (error) {  // Error message if cannot connect to API server at all        
         console.log("  Cannot connect to Geolocation API - presenting modal alert") //if location is falsy then request location
         modalEl.style.display = "inline";
         modalTitleEl.textContent = "Cannot connect to Geolocation Server";
@@ -108,8 +110,12 @@ var fetchForecast = () => {
     console.log("\n\n\n > fetchForecast() Called")    
     console.log("Latitude = " + lat)
     console.log("Longitude = " + lon)
+        
+    var apiForecast = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&cnt=80&appid=${apiKey}&exclude=minutely,hourly,alert`;
+    console.log(apiForecast);
+
     
-    var apiForecast = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&cnt=80&appid=${apiKey}`;
+    
 
     console.log("  fetching forecast from API..");  
     fetch(apiForecast).then(function (response) {      
@@ -170,7 +176,7 @@ var submitStorage = () => {
     } else {
         console.log("  " + searchCity + " already appears in previous searches - not adding to local storage")    
 }
-    displayForecast(); 
+    manipulateData(); 
     return;
 };
 
@@ -178,11 +184,12 @@ var submitStorage = () => {
 //- Function - Retrieve previous searches from Local Storage Forecast -//
 //---------------------------------------------------------------------//
 var retrieveStorage = () => {
+    console.log("\n\n\n > retrieveStorage() Called")
     let previousSearch = localStorage.getItem('locationforecast');                                   // retrieve data from local storage ('key = recipes') - store as savedRecipes    
     console.log("  PreviousSearch Array: " + previousSearch)           
         if (previousSearch) {                                                                     // If savedRecipes is not null or undefined, then
             previousSearchArray = JSON.parse(previousSearch);                                             // convert to JSON object and store as recipeArray
-            console.log("  Previous locations retrieved from local storage (key = 'locationforecast'):");
+            console.log("  Retrieved (key = 'locationforecast'):");
             console.log("    previousSearchArray:\n    ------------");
             console.log(previousSearchArray);
             renderHistoryButtons();                                                                   // Run displayRecipes() to display them 
@@ -194,22 +201,70 @@ var retrieveStorage = () => {
         };                                                     
 };
 
+//------------------------------//
+//- Function - Manipulate data -//
+//------------------------------//
+var manipulateData = () => {
+    console.log("\n\n\n > manipulateData() Called")
+    console.log ("Before manipulation")
+    console.log (forecastDataArray)
+
+    // date
+
+     for (let i=0; i< forecastDataArray.list.length; i = i+1) {
+      //  var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // Declare var AEDT store date/time convert from Unix to AEDT
+        AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('ddd, D/M/YYYY, HH:mm:ss A')
+    //     //AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // Declare var AEDT store date/time convert from Unix to AEDT
+       
+        console.log(AEDT)
+    //     forecastDataArray.list[i].dt = AEDT    //update object array to match AEDT rounded date/time
+        
+    //     console.log("forecastDataArray" + forecastDataArray.list[i].dt );
+        
+    //     // constDateArray = forecastDataArray(groupDate)
+
+    //     //         function groupDate(date) {
+    //     //             return 
+    //     //         }
+
+ }
+
+ 
+// MinMax
+    
+        // console.log(forecastDataArray.list.main.temp.min)
+        // console.log(forecastDataArray.list.main.temp.max)
+    
+
+
+    console.log ("After manipulation")       
+      console.log(forecastDataArray)
+
+
+
+
+
+    displayForecast(); 
+    return;
+};
+
+
+
+
 //-------------------------------//
 //- Function - Display Forecast -//
 //-------------------------------//
 var displayForecast = () => {
     console.log("\n\n\n > displayForecast() Called");  
     console.log("  search term used = '" + searchCity + "'"); 
-    
-    locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;
-      
+    forecastContainerEl.innerHTML = ""    
+
+    locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;  //used in subtitle
+     
     console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
   
     for (let i = 0; i < forecastDataArray.list.length; i = i+1) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
-        
-        var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // Declare var AEDT store date/time convert from Unix to AEDT
-               
-        
+                
         var forecastCity = "City: " + forecastDataArray.city.name;
         var forecastDate = "Date/Time: " + AEDT + " AEDT";
         var forecastTemp = "Temp: " + forecastDataArray.list[i].main.temp + "\xB0 C";
@@ -219,14 +274,14 @@ var displayForecast = () => {
         var forecastHummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
         var forecastIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
         
-        let forecastText = i+": " + forecastCity + ", " + forecastDate + ", " + forecastTemp + ", " + forecastMinTemp + ", " + forecastMaxTemp + ", " + forecastWind + ", " + forecastHummidity + ", " + forecastIcon;
+        //let forecastText = i+": " + forecastCity + ", " + forecastDate + ", " + forecastTemp + ", " + forecastMinTemp + ", " + forecastMaxTemp + ", " + forecastWind + ", " + forecastHummidity + ", " + forecastIcon;
         //console.log(forecastText);
 
-        var forecastCardEl = document.createElement('li');                                                                                             // Create recipe container (li) - this will be appended to main 'ul" container (resutlsTableEl)
-        forecastCardEl.classList.add ("forecast-container", "border-2", "rounded-xl", "flex", "flex-wrap", "p-1", "m-1", "border-emerald-400", "bg-white", "dark:bg-slate-900", "w-96");                // Add class (tailwind style)
+        var forecastCardEl = document.createElement('li');                                                                                             
+        forecastCardEl.classList.add ("forecast-container", "border-2", "rounded-xl", "flex", "flex-wrap", "p-1", "m-1", "border-emerald-400", "bg-white", "dark:bg-slate-900", "w-96");       
         forecastCardEl.classList.add ("transition", "duration", "300", "ease-in-out")
         forecastCardEl.textContent = i
-        forecastContainerEl.appendChild(forecastCardEl);                                                                                                    // Append recipeContinerEl to resultsTableEl
+        forecastContainerEl.appendChild(forecastCardEl);                                                                                                 
 
             var forecastDateEl = document.createElement('div')
             forecastDateEl.classList.add("bg-emerald-300", "w-full")                                                                       
@@ -292,10 +347,10 @@ var renderHistoryButtons = () => {
     };
     if (previousSearchArray.length > 0) {        
         console.log("  Showing Clear History Button");
-        clearHistoryBtn.hidden = false;      // show the "clear history" button
+        clearHistoryBtn.hidden = false;      // Show the "clear history" button
     } else {        
         console.log("  Hiding Clear History Button");
-        clearHistoryBtn.hidden = true;       // hide the "clear history" button
+        clearHistoryBtn.hidden = true;       // Hide the "clear history" button
     }
     return;
 };
@@ -306,7 +361,7 @@ var renderHistoryButtons = () => {
 clearHistoryBtn.addEventListener("click", function(event) {   
     console.log("\n\n\n ! clearHistoryBtn clicked");  
     console.log(previousSearchArray);
-    localStorage.removeItem('locationforecast');                             // Store successful searches into Local storage (store "search" into Key "locationforecast")
+    localStorage.removeItem('locationforecast');                    // Store successful searches into Local storage (store "search" into Key "locationforecast")
     previousSearchArray = [];
     console.log("  History cleared")
     renderHistoryButtons();
@@ -317,7 +372,7 @@ clearHistoryBtn.addEventListener("click", function(event) {
 //------------------------------------------//
 previousSearchButtonContainerEl.addEventListener("click", function(event) {        
     console.log("\n\n\n ! previousSearchButtonContainerEl clicked");  
-    let element = event.target;                   // declare var element = element that was clicked by user
+    let element = event.target;                                  // declare var element = element that was clicked by user
     if (element.matches("button") === true) { 
 
        console.log("  ! Button element clicked");
@@ -358,7 +413,7 @@ modalCloseBtn.addEventListener('click', function() {
 //- Listener - Page Load to generated history buttons-//
 //----------------------------------------------------//
 
-window.addEventListener('load', function () {                                               // Event listener that triggers on page load
+window.addEventListener('load', function () {                  // Event listener that triggers on page load
     console.log("\n\n\n! Page load triggered");
     retrieveStorage();
 });      
