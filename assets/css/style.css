@@ -3,5 +3,5 @@
 @tailwind utilities; /* This injects Tailwind's utility classes and any utility classes registered by plugins. */
 
 * {
-    font-size: 12px;
+    font-size: 16px;
 }

@@ -57,7 +57,7 @@ var assessSearchValue = event =>  {
 var fetchCoordinates = () => {
     console.log ("\n\n\n > fetchCoordinates() called");
     
-    var apiCoordinates = "http://api.openweathermap.org/geo/1.0/direct?q=" + searchCity + "&limit=5&appid=" + apiKey;     // to get longitude/latitude info
+    var apiCoordinates = "https://api.openweathermap.org/geo/1.0/direct?q=" + searchCity + "&limit=5&appid=" + apiKey;     // to get longitude/latitude info
     console.log("  fetching coordinates from OpenWeather Geocoding API ...");
     console.log(apiCoordinates);
 
@@ -114,7 +114,7 @@ var fetchForecast = () => {
     console.log("Latitude = " + lat)
     console.log("Longitude = " + lon)
         
-    var apiForecast = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&cnt=80&appid=${apiKey}&exclude=minutely,hourly,alert`;
+    var apiForecast = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&cnt=80&appid=${apiKey}&exclude=minutely,hourly,alert`;
     console.log(apiForecast);
 
     
