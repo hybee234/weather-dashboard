@@ -135,14 +135,14 @@
 <!-- MODAL START -->
     <!-- Modal window -->
     <!-- Main modal -->
-    <div id="modal" aria-hidden="true" class="absolute z-10 hidden md:inset-0 h-[calc(100%-1rem)] max-h-fit">
-        <div class="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+    <div id="modal" aria-hidden="true" class="absolute z-10 hidden inset-0 h-[calc(100%-1rem)] max-h-fit bg-gray-500 bg-opacity-80">
+        <div class="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4/5">
             <!-- Modal content -->
             <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
                 <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="modalTitle">
-                        Search field Blank
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="modal-title">
+                        Modal Title
                     </h3>
                     <!--Close button (cross)-->
                     <button type="button" id = "modal-close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="modal">
@@ -156,9 +156,12 @@
                 </div>
                 <!-- Modal body -->
                 <div class="p-6 space-y-6 text-center">
-                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400" id="modalLineOne">
-                        Please enter a city name
-                    </p>                   
+                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400" id="modal-line-one">
+                        Modal Line One
+                    </p>
+                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400" id="modal-line-two">
+                        Modal Line Two
+                    </p>                      
                 </div>
                 <!-- Modal footer -->
                 <div class="flex justify-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">

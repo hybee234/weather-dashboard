@@ -3,19 +3,22 @@ var languageButtonsEl = document.querySelector('#language-buttons'); //buttons t
 var searchInputEl = document.querySelector('#search-field');
 var forecastContainerEl = document.querySelector('#forecast-container');
 var locationSpanEl = document.querySelector('#location-display'); // name that comes after "weather forecaast for:"
-let modalEl =  document.getElementById('modal');                                    //Modal window
-let modalOKBtn = document.getElementById('modal-ok')
-let modalCloseBtn = document.getElementById('modal-close')
+let modalEl =  document.getElementById('modal');                                    // Modal Window
+let modalTitleEl = document.getElementById('modal-title');                         // Modal Title Text
+let modalLineOneEl = document.getElementById('modal-line-one');                    // Modal Pragraph line one
+let modalLineTwoEl = document.getElementById('modal-line-two');                    // Modal Pragraph line two
+let modalOKBtn = document.getElementById('modal-ok')                                // Modal OK button
+let modalCloseBtn = document.getElementById('modal-close')                          // Modal Close button (cross)
 
 var apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6";
-var lat = "-37.81373321550253";   // latitude to be populated by co-ordinate API (Default is Melbourne)
-var lon = "144.96284987796403";   // longitude to be populated by co-ordinate API (Default is Melbourne)
-var search = ""
-var coordDataArray = [];          // Object to store coordinate API data returned
+var lat = "-37.81373321550253";                   // latitude to be populated by co-ordinate API (Default is Melbourne)
+var lon = "144.96284987796403";                   // longitude to be populated by co-ordinate API (Default is Melbourne)
+var search = ""                                   // search term used
+var coordDataArray = [];                          // Object to store coordinate API data returned
 var forecastDataArray = [];
-var nameAPI = "" // to store city name from API
-var stateAPI = ""  //to store state name from API
-var countryAPI = "" // to store Country code value from API
+var nameAPI = ""                                  // to store city name from API
+var stateAPI = ""                                 //to store state name from API
+var countryAPI = ""                               // to store Country code value from API
 
 //----------------------------------//
 //- Check if Search Value is empty -//
@@ -26,31 +29,21 @@ function assessSearchValue(event) {
   event.preventDefault();
   search = searchInputEl.value.trim().toLowerCase();         // Set value of global var "search" = value in search field (trimmed and lowercase)
   //console.log("  search captured is: " + search);  
-   if (search !=="") {                                       //if search is not blankthen execute code block
+   if (search !=="") {                                       //if search is not blank then execute code block
      console.log("  Submitted search ('" + search + "')"); 
      forecastContainerEl.textContent = '';                   //clear forecast container (list of forecast)
      searchInputEl.value = '';                               //clear search field
-     //Store search value in local storage
+     // TO DO: Store search value in local storage
      fetchCoordinates();                                     // Use named city to fetch co-ordinates to use in the weather forecast API
    } else {    
     console.log("  Search field empty - presenting modal alert") //if location is falsy then request location
-    modalEl.style.display = "inline";        
+    modalEl.style.display = "inline";
+    modalTitleEl.textContent = "Search field Blank";
+    modalLineOneEl.textContent = "Please enter a city name";
+    modalLineTwoEl.textContent = "";
    };
    return;
 };
-
-//-------------------------------//
-//- Prepare request by language - TO UPDATE -//
-// //-------------------------------//
-// function buttonClickHandler (event) {
-//   console.log("\n\n\n > buttonClickHandler() Called")  
-//   var language = event.target.getAttribute('data-language');  // declare local var "language" = data-language value of element that triggered
-
-//   if (language) {                     // if language is truthy then carry out the block
-//     getFeaturedRepos(language);       // execute getFeaturedRepos wit
-//     forecastContainerEl.textContent = ''; //clear any existing repo/weather forecast displayed.
-//   }
-// };
 
 // ----------------------------------//
 // - Fetch co-ordinates by location -//
@@ -66,7 +59,11 @@ function fetchCoordinates () {
             //console.log(coordData);       // Data from API
             //If the "data" array is zero length (i.e. no location found) then present alert indication this, otherwise assign latitude and longtitude to variables
               if ( coordData.length === 0 ) {
-                alert ('No location found - please try again');
+                console.log("  Could not match city - presenting modal alert") //if location is falsy then request location
+                modalEl.style.display = "inline";
+                modalTitleEl.textContent = "Not match found";
+                modalLineOneEl.textContent = "Please search with different terms";
+                modalLineTwoEl.textContent = "";
                 return;
               } else {
                 coordDataArray = coordData //store coordData from API into local object "coordDataArray"
@@ -82,11 +79,20 @@ function fetchCoordinates () {
               };
               fetchForecast();        
             });
-        } else {                
-            alert('Error in co-ordinates: ' + response.statusText); // Can connect to API server but error sent back
+        } else {                            
+            console.log("  Error in API request - presenting modal alert") //if location is falsy then request location
+            modalEl.style.display = "inline";
+            modalTitleEl.textContent = "Error in request";
+            modalLineOneEl.textContent = "Please review and try again.";
+            modalLineTwoEl.textContent = "Error response: " + response.statusText + ".";
         }
     }).catch(function (error) {  // Error message if cannot connect to API server at all
         alert('Unable to connect to Openweathermap Geolocation');
+        console.log("  Cannot connect to API - presenting modal alert") //if location is falsy then request location
+        modalEl.style.display = "inline";
+        modalTitleEl.textContent = "Cannot connect to Server";
+        modalLineOneEl.textContent = "The weather server appears to be offline.";
+        modalLineTwoEl.textContent = "Please try again another time.";
     });
     return;
 };
@@ -180,10 +186,8 @@ function displayForecast () {
 };
 
 
-//list-item = padding, marging colours etc
-// flex-row =  display: flex;   flex-wrap: wrap;
-// align-center = align-items: center;
-// justify-space-between = justify-content: space-between;
+
+
 
 //-----------------------------------------------//
 //- Listener to capture click to "Get Forecast" -//
@@ -193,16 +197,6 @@ searchFormEl.addEventListener('submit', function(event) {
   console.log("\n\n\n ! userFormEl Submitted");    
   assessSearchValue(event);
 });
-
-
-//----------------------------------------------------//
-//- Listener to capture click to "Previous Searches" -//
-//----------------------------------------------------//
-
-// languageButtonsEl.addEventListener('click', function(event) {
-//   console.log("\n\n\n ! languageButtonsEl Clicked");  
-//   buttonClickHandler(event);
-// });
 
 //-----------------------------//
 //- Modal window OK and close -//
