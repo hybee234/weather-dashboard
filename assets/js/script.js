@@ -187,7 +187,28 @@ function displayForecast () {
     
     let forecastText = i+": " + forecastCity + ", " + forecastDate + ", " + forecastTemp + ", " + forecastMinTemp + ", " + forecastMaxTemp + ", " + forecastWind + ", " + forecastHummidity + ", " + forecastIcon;
     console.log(forecastText);
-        
+  
+//From Project 1
+  var forecastCardEl = document.createElement('li');                                                                                             // Create recipe container (li) - this will be appended to main 'ul" container (resutlsTableEl)
+  forecastCardEl.classList.add ("forecast-container", "border-8", "rounded-3xl", "flex", "flex-wrap", "m-5", "border-emerald-400", "bg-white", "dark:bg-slate-900");                // Add class (tailwind style)
+  forecastCardEl.classList.add ("body", "transition", "duration", "300", "ease-in-out")
+  forecastCardEl.textContent = "Test: " + i
+  forecastContainerEl.appendChild(forecastCardEl);                                                                                                    // Append recipeContinerEl to resultsTableEl
+
+//         var linkContainerEl = document.createElement('div');                                                                                      // Create link container - one of 2 child element to recipe container
+//         linkContainerEl.classList.add("link-container", "p-3", "flex", "justify-center", "items-center", "w-full", "md:w-1/2");                   // Add class (tailwind style)
+//         recipeContainerEl.appendChild(linkContainerEl);                                                                                           // Append link container to recipe container
+
+//                 var linkEl = document.createElement ('a');                                                                                        // Create link element                
+//                 linkEl.classList.add ("link-link");                                                                                               // Add class (tailwind style)
+//                 linkEl.href = recipeArray.hits[i].recipe.url;                                                                                     // Define link
+//                 linkEl.target = "_blank";                                                                                                         // Open Link on new tab
+//                 linkContainerEl.appendChild(linkEl);                    
+
+// End project 1
+
+
+
     //Build and append containers
     
     var forecastEl = document.createElement('div');                                       // Declare var forecastEl - create new 'div' element
