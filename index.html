@@ -7,8 +7,7 @@
             <meta http-equiv="X-UA-Compatible" content="ie=edge">      
             <link rel="stylesheet" href="./assets/css/reset.css" />
             <script src="https://kit.fontawesome.com/80af804818.js" crossorigin="anonymous"></script> <!--fontawesome icons-->                 
-            <!-- <link rel="stylesheet" href="./assets/css/tailwind.css" /> -->
-            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+            <link rel="stylesheet" href="./assets/css/tailwind.css"/>
             <link rel="stylesheet" href="./assets/css/style.css" />
       
             <title>Huber Weather Dashborad</title>
@@ -24,11 +23,11 @@
             </header>
 
       <!-- main container for aside and section -->
-            <main class="flex flex-wrap bg-blue-200 border-8 border-blue-300 p-2 justify-center">
+            <main class="flex flex-wrap bg-blue-200 border-8 border-blue-300 p-2 justify-center h-fit">
                   <!-- Aside container -->                  
                   <aside class="flex-col bg-blue-100 border-2 border-blue-400 p-2 grow shrink basis-200 my-1 sm:w-1/3 md:w-1/4 lg:w-1/5 ">
                         <!-- search box container -->
-                        <div class="justify-center items-center border-2 border-blue-600 mb-5 w-full pb-2">
+                        <div class="justify-center items-center text-center border-2 border-blue-600 mb-5 w-full pb-2">
                                     <!--TODO: To remove border-->
                               <h3 class="text-blue-300 bg-blue-800 p-2 mb-2 w-full">SEARCH FOR A CITY</h3>
                               <form id="search-form" class="flex flex-wrap justify-center items-center">
@@ -39,16 +38,14 @@
                         </div>
                         
                         <!-- Search history container -->
-                        <div class="justify-center items-center border-2 border-blue-600 w-full">
+                        <div id="prev-search-cont" class=" justify-center items-center text-center border-2 border-blue-600 w-full">
                                     <!--TODO: To remove border-->
                               <h3 class="text-blue-300 bg-blue-800 p-2 mb-2 w-full">HISTORY</h3>
-                              <div id="previous-search-buttons" class="flex flex-wrap justify-center items-center w-full pb-2">
-                                    <!--TODO: To be replaced by dynamically created buttons-->
-                                    <button 
-                                          data-search="Melbourne"
-                                          class="w-4/5 my-1 p-2 rounded-md shadow-md shadow-black bg-blue-300 hover:shadow-lg hover:shadow-black hover:bg-blue-400 ease out hover:ease-in">
-                                          Melbourne
-                                    </button>   <!-- dynamically populate search history here based on local storage -->     
+                              <div id="prev-search-button-container" class="flex flex-wrap justify-center items-center w-full">
+                                    <!-- Dynamically created history buttons-->
+                              </div>
+                              <div class="flex flex-wrap justify-center items-center w-full"></div>
+                                    <button id = "clear-history" class="w-3/5 p-2 mt-1 mb-3 rounded-md shadow-md shadow-black bg-red-300 hover:shadow-lg hover:shadow-black hover:bg-red-400 ease out hover:ease-in text-sm">Clear History</button>
                               </div>
                         </div>                        
                   </aside>
@@ -63,65 +60,9 @@
                         </div>
                         <!--Section below with the remaining 4 days-->
                         
-                        <div id="forecast-container" class="flex flewwrap grow-0 shrink-0 border-blue-300 border-2">ID = "forecast-container"
+                        <div id="forecast-container" class="flex flex-wrap border-blue-300 border-2">
 
-                        </div>
-                        
-                        <!-- <div class = "bg-green-300">
-                              <div></div>
-                                    <h3>Fix boxes  start here. 5-day forecast</h3>
-                              </div>
-
-                              <div class = "forecast-card">
-                                    <p> Date (day 1) </p>
-                                    <i> icon</i>
-                                    <ul>
-                                          <li class= "temp"><strong>Temp:</strong>  degrees Celcius</li>
-                                          <li class= "wind"><strong>Wind:</strong>  km/hr</li>
-                                          <li class= "humidity"><strong>Humidity:</strong>  humidity</li>
-                                    </ul>
-                              </div>
-
-                              <div class = "forecast-card">
-                                    <p> Date (day 2) </p>
-                                    <i> icon</i>
-                                    <ul>
-                                          <li class= "temp"><strong>Temp:</strong>  degrees Celcius</li>
-                                          <li class= "wind"><strong>Wind:</strong>  km/hr</li>
-                                          <li class= "humidity"><strong>Humidity:</strong>  humidity</li>
-                                    </ul>
-                              </div>
-                  
-                              <div class = "forecast-card">
-                                    <p> Date (day 3) </p>
-                                    <i> icon</i>
-                                    <ul>
-                                          <li class= "temp"><strong>Temp:</strong>  degrees Celcius</li>
-                                          <li class= "wind"><strong>Wind:</strong>  km/hr</li>
-                                          <li class= "humidity"><strong>Humidity:</strong>  humidity</li>
-                                    </ul>
-                              </div>
-                        
-                              <div class = "forecast-card">
-                                    <p> Date (day 4) </p>
-                                    <i> icon</i>
-                                    <ul>
-                                          <li class= "temp"><strong>Temp:</strong>  degrees Celcius</li>
-                                          <li class= "wind"><strong>Wind:</strong>  km/hr</li>
-                                          <li class= "humidity"><strong>Humidity:</strong>  humidity</li>
-                                    </ul>
-                              </div class = "forecast-card">
-                        
-                              <div class = "forecast-card">
-                                    <p> Date (day 5) </p>
-                                    <i> icon</i>
-                                    <ul>
-                                          <li class= "temp"><strong>Temp:</strong>  degrees Celcius</li>
-                                          <li class= "wind"><strong>Wind:</strong>  km/hr</li>
-                                          <li class= "humidity"><strong>Humidity:</strong>  humidity</li>
-                                    </ul>
-                              </div>
-                        </div> -->
+                        </div>    
                   </section>
 
 
