@@ -157,10 +157,9 @@ function displayForecast () {
   locationSpanEl.textContent = nameAPI + ", " + stateAPI + ", " + countryAPI + "   |   Lat/Lon:   " + lat + ", " + lon;
      
   console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
-
+  
 //run single loop for "ID = forecast-one" - or assign values to forecast one ... //
 //Or just have HTML there and assign values to first one
-
 
 // for loop to create remaining forecast. 
 // Cards with values:
@@ -170,15 +169,23 @@ function displayForecast () {
 // Wind (km/h)
 // Humidity (percentage)
 
-
 //forcast text, create 3 HTML elements and append
-  for (var i = 0; i < 50 || i < forecastDataArray.length; i = i+1) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
-    
-    // Declare var AEDT store date/time convert from Unix to AEDT
-    var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // TO DO *** Can remove time at the end
+  for (let i = 0; i < forecastDataArray.list.length; i = i+1) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
+        
+    var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // Declare var AEDT store date/time convert from Unix to AEDT
     
     // Declare weatherForecast variable and store weather forecast text 
-    var forecastText = i + ". City: " + forecastDataArray.city.name + ", Date/Time: " + AEDT + " AEDT , Temp: " + forecastDataArray.list[i].main.temp + ", Min: " + forecastDataArray.list[i].main.temp_min + ", Max: " + forecastDataArray.list[i].main.temp_max;  //build the forecst
+    
+    var forecastCity = "City: " + forecastDataArray.city.name;
+    var forecastDate = "Date/Time: " + AEDT + " AEDT";
+    var forecastTemp = "Temp: " + forecastDataArray.list[i].main.temp;
+    var forecastMinTemp = "Min: " + forecastDataArray.list[i].main.temp_min + "\xB0 C";
+    var forecastMaxTemp = "Max: " + forecastDataArray.list[i].main.temp_max + "\xB0 C";
+    var forecastWind = "Wind: " + forecastDataArray.list[i].wind.speed + "km/hr";
+    var forecastHummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
+    var forecastIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
+    
+    let forecastText = i+": " + forecastCity + ", " + forecastDate + ", " + forecastTemp + ", " + forecastMinTemp + ", " + forecastMaxTemp + ", " + forecastWind + ", " + forecastHummidity + ", " + forecastIcon;
     console.log(forecastText);
         
     //Build and append containers
@@ -191,30 +198,43 @@ function displayForecast () {
         forecastEl.appendChild(titleEl);                                                  // Append titleEl (child) to forecastEl (parent)
 
     var statusEl = document.createElement('span');                                        // Declare Var statusEl  - create new 'span' element
-        statusEl.classList = 'flex-row align-center';                                     // Add classes to span element
-        statusEl.textContent = " **" + [i];                          // Just for Hy's troubleshooting (i value)
+        statusEl.classList = 'flex-row align-center';                                     // Add classes to span element        
         forecastEl.appendChild(statusEl);                                                 // Append statusEl (child) to forecastEl (parent)   
     
     forecastContainerEl.appendChild(forecastEl);                                           // Append forecastEl (parent) to forecastContainerEl (parent)
   }
+  //Store search term in local history
 };
 
 
 
+//-------------------------------------//
+//- Function - Render history buttons -//
+//-------------------------------------//
+
+//To be called by page load and after rendering forecast
 
 
-//-----------------------------------------------//
-//- Listener to capture click to "Get Forecast" -//
-//-----------------------------------------------//
+//----------------------------------//
+//- Listener - Clear local storage -//
+//----------------------------------//
+
+// Button to clear local storage
+
+
+
+//--------------------------------------------------//
+//- Listener - form submission to "Get Forecast" -//
+//--------------------------------------------------//
 
 searchFormEl.addEventListener('submit', function(event) {
   console.log("\n\n\n ! userFormEl Submitted");    
   assessSearchValue(event);
 });
 
-//-----------------------------//
-//- Modal window OK and close -//
-//-----------------------------//
+//----------------------------------------//
+//- Listener - Modal window OK and close -//
+//----------------------------------------//
 
 modalOKBtn.addEventListener('click', function() {
   console.log("\n\n\n ! modalOKBtn Clicked")
@@ -225,4 +245,11 @@ modalCloseBtn.addEventListener('click', function() {
   console.log("\n\n\n ! modalCloseBtn Clicked")
   modalEl.style.display = "none"
 })
+
+//----------------------------------------------------//
+//- Listener - Page Load to generated history buttons-//
+//----------------------------------------------------//
+
+//event listener to retrieve storage 
+
 
