@@ -23,9 +23,9 @@
             </header>
 
       <!-- main container for aside and section -->
-            <main class="flex flex-wrap bg-red-200 border-8 border-red-300 p-2 justify-center">
+            <main class="flex flex-wrap bg-blue-200 border-8 border-blue-300 p-2 justify-center">
                   <!-- Aside container -->                  
-                  <aside class="flex flex-wrap bg-red-300 border-2 border-red-400 p-2 grow-0 shrink basis-80 my-1">
+                  <aside class="flex-col bg-blue-100 border-2 border-blue-400 p-2 grow shrink basis-200 my-1 sm:w-1/3 md:w-1/4 lg:w-1/5 ">
                         <!-- search box container -->
                         <div class="justify-center items-center border-2 border-blue-600 mb-5 w-full pb-2">
                                     <!--TODO: To remove border-->
@@ -40,33 +40,25 @@
                         <!-- Search history container -->
                         <div class="justify-center items-center border-2 border-blue-600 w-full">
                                     <!--TODO: To remove border-->
-                              <h3 class="text-blue-300 bg-blue-800 p-2 mb-2 w-full">PREVIOUS SEARCHES</h3>
+                              <h3 class="text-blue-300 bg-blue-800 p-2 mb-2 w-full">HISTORY</h3>
                               <div id="previous-search-buttons" class="flex flex-wrap justify-center items-center w-full pb-2">
                                     <!--TODO: To be replaced by dynamically created buttons-->
                                     <button 
                                           data-search="Melbourne"
-                                          class="w-4/5 my-1 pt-2 rounded-md shadow-md shadow-black bg-blue-300 hover:shadow-lg hover:shadow-black hover:bg-blue-400 ease out hover:ease-in">
+                                          class="w-4/5 my-1 p-2 rounded-md shadow-md shadow-black bg-blue-300 hover:shadow-lg hover:shadow-black hover:bg-blue-400 ease out hover:ease-in">
                                           Melbourne
-                                    </button>   <!-- dynamically populate search history here based on local storage -->
-                                    <button
-                                          data-search="Sydney"
-                                          class="w-4/5 my-1 p-2 rounded-md shadow-md shadow-black bg-blue-300 hover:shadow-lg hover:shadow-black hover:bg-blue-400 ease out hover:ease-in">
-                                          Sydney
-                                    </button> <!-- dynamically populate search history here based on local storage -->
-                                    <button
-                                          data-search="Brisbane"
-                                          class="w-4/5 my-1 p-2 rounded-md shadow-md shadow-black bg-blue-300 hover:shadow-lg hover:shadow-black hover:bg-blue-400 ease out hover:ease-in">
-                                          Brisbane
-                                    </button> <!-- dynamically populate search history here based on local storage-->
+                                    </button>   <!-- dynamically populate search history here based on local storage -->     
                               </div>
                         </div>                        
                   </aside>
                   
                   <!-- Weather forecast Container-->
-                  <section class="flex flex-wrap  bg-red-300 border-2 border-red-400 p-2 grow shrink my-1"> 
+                  <section class="flex flex-wrap  bg-blue-100 border-2 border-blue-400 p-2 grow shrink basis-200px my-1 sm:w-2/3 md:w-3/4 lg:w-4/5"> 
                         <!-- Weather forecast for today - larger span width of section container-->
-                        <div class="w-full bg-blue-100 border-2 border-blue-500">
-                              <h2 class="subtitle">Weather forcast for (class "subtitle") : <span id="location-display"></span></h2>                              
+                        <div id="forecast-one" class="w-full bg-blue-100 border-2 border-blue-500 text-center">
+                              <h2 class="subtitle bg-blue-400 text-2xl">Weather forecast for:
+                                    <div id="location-display"></div>
+                              </h2>                              
                         </div>
                         <!--Section below with the remaining 4 days-->
                         
@@ -165,7 +157,7 @@
                 </div>
                 <!-- Modal footer -->
                 <div class="flex justify-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                    <button id ="modal-ok" data-modal-hide="modal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">OK</button>                    
+                    <button id ="modal-ok" data-modal-hide="modal" type="button" class="my-1 p-2 px-5 rounded-md shadow-md shadow-black bg-blue-300 hover:shadow-lg hover:shadow-black hover:bg-blue-400 ease out hover:ease-in">OK</button>                    
                 </div>
             </div>
         </div>
