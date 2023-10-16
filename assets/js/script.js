@@ -3,6 +3,9 @@ var languageButtonsEl = document.querySelector('#language-buttons'); //buttons t
 var searchInputEl = document.querySelector('#search-field');
 var forecastContainerEl = document.querySelector('#forecast-container');
 var locationSpanEl = document.querySelector('#location-display'); // name that comes after "weather forecaast for:"
+let modalEl =  document.getElementById('modal');                                    //Modal window
+let modalOKBtn = document.getElementById('modal-ok')
+let modalCloseBtn = document.getElementById('modal-close')
 
 var apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6";
 var lat = "-37.81373321550253";   // latitude to be populated by co-ordinate API (Default is Melbourne)
@@ -22,16 +25,16 @@ function assessSearchValue(event) {
   console.log("\n\n\n > assessSearchValue() Called");   
   event.preventDefault();
   search = searchInputEl.value.trim().toLowerCase();         // Set value of global var "search" = value in search field (trimmed and lowercase)
-  console.log("  search captured is: " + search);  
+  //console.log("  search captured is: " + search);  
    if (search !=="") {                                       //if search is not blankthen execute code block
-     console.log("  search not empty - Good"); 
+     console.log("  Submitted search ('" + search + "')"); 
      forecastContainerEl.textContent = '';                   //clear forecast container (list of forecast)
      searchInputEl.value = '';                               //clear search field
      //Store search value in local storage
      fetchCoordinates();                                     // Use named city to fetch co-ordinates to use in the weather forecast API
-   } else {
-    console.log("  search is empty - bad")  
-    alert('Please enter a location');                         //if location is falsy then request location     //!!!! Turn this into modal
+   } else {    
+    console.log("  Search field empty - presenting modal alert") //if location is falsy then request location
+    modalEl.style.display = "inline";        
    };
    return;
 };
@@ -58,9 +61,9 @@ function fetchCoordinates () {
     console.log("  fetching coordinates from OpenWeather Geocoding API ...");
     fetch(apiCoordinates).then(function (response) {      
         if (response.ok) {
-            console.log("  ... API Response received (see below)");
+            console.log("  ... fetchCoordinates API Response received");
             response.json().then(function (coordData) {   //store API reponse temporary in "coordData"
-            console.log(coordData);       // Data from API
+            //console.log(coordData);       // Data from API
             //If the "data" array is zero length (i.e. no location found) then present alert indication this, otherwise assign latitude and longtitude to variables
               if ( coordData.length === 0 ) {
                 alert ('No location found - please try again');
@@ -99,9 +102,9 @@ function fetchForecast () {
     console.log("  fetching forecast from API..");  
     fetch(apiForecast).then(function (response) {      
         if (response.ok) {
-            console.log("  ... API Response received (see below)");            
+            console.log("  ... fetchForecast API Response received");            
             response.json().then(function (forecastData) {  //store API reponse temporary in "forecastData"
-            console.log(forecastData);   // Data from API
+            //console.log(forecastData);   // Data from API
                 forecastDataArray = forecastData; //store forecastData from API into local object "forecastDataArray"
                 console.log(" Forecast API data stored in global variable 'forecastDataArray'");
                 console.log(forecastDataArray);
@@ -117,34 +120,8 @@ function fetchForecast () {
     return;
 };
 
-//---------------------------//
-//- Fetch Repos by Language -//
-// //---------------------------//
-// function getFeaturedRepos (language) {
-//   console.log("\n\n\n > getFeaturedRepos() Called")  
-//   var apiUrl = 'https://api.github.com/search/repositories?q=' + language + '+is:featured&sort=help-wanted-issues';
-
-//   fetch(apiUrl)  //fetch URL above
-//   .then(function (response) {   //then do something with the response
-//     console.log(" function response initiating")
-//     if (response.ok) {
-//       console.log("response OK");
-//       response.json()     //convert response into json object
-//       .then(function (data) {   //Data now in JSON Format
-//         console.log(data);
-//         displayRepos(data.items, location);
-//       });
-//     } else {
-//       alert('Error: ' + response.statusText);
-//     }
-//   })
-//   .catch(function (error) {
-//     alert('Unable to connect to Openwetahermap');
-//   });
-// };
-
 //---------------------//
-//- Display Forecaset -//
+//- Display Forecast -//
 //---------------------//
 function displayForecast () {
   console.log("\n\n\n > displayForecast() Called");
@@ -213,16 +190,31 @@ function displayForecast () {
 //-----------------------------------------------//
 
 searchFormEl.addEventListener('submit', function(event) {
-  console.log("\n\n\n ! userFormEl Clicked");    
+  console.log("\n\n\n ! userFormEl Submitted");    
   assessSearchValue(event);
 });
 
 
-// //----------------------------------------------------//
-// //- Listener to capture click to "Previous Searches" -//
-// //----------------------------------------------------//
+//----------------------------------------------------//
+//- Listener to capture click to "Previous Searches" -//
+//----------------------------------------------------//
 
 // languageButtonsEl.addEventListener('click', function(event) {
 //   console.log("\n\n\n ! languageButtonsEl Clicked");  
 //   buttonClickHandler(event);
 // });
+
+//-----------------------------//
+//- Modal window OK and close -//
+//-----------------------------//
+
+modalOKBtn.addEventListener('click', function() {
+  console.log("\n\n\n ! modalOKBtn Clicked")
+  modalEl.style.display = "none"
+})
+
+modalCloseBtn.addEventListener('click', function() {
+  console.log("\n\n\n ! modalCloseBtn Clicked")
+  modalEl.style.display = "none"
+})
+
