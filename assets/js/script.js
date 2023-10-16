@@ -14,23 +14,24 @@ var nameAPI = "" // to store city name from API
 var stateAPI = ""  //to store state name from API
 var countryAPI = "" // to store Country code value from API
 
-//------------------------------//
-//- Check if location is empty -//
-//------------------------------//
+//----------------------------------//
+//- Check if Search Value is empty -//
+//----------------------------------//
 
-function checkSearchEmpty(event) {  
-  console.log("\n\n\n > checkSearchEmpty() Called");   
+function assessSearchValue(event) {  
+  console.log("\n\n\n > assessSearchValue() Called");   
   event.preventDefault();
-  search = searchInputEl.value.trim().toLowerCase();         // Set value of global var "location" = value in search field (trimmed and lowercase)
+  search = searchInputEl.value.trim().toLowerCase();         // Set value of global var "search" = value in search field (trimmed and lowercase)
   console.log("  search captured is: " + search);  
-   if (search !=="") {                           //if search is truthy then execute code block
+   if (search !=="") {                                       //if search is not blankthen execute code block
      console.log("  search not empty - Good"); 
-     forecastContainerEl.textContent = '';         //clear forecast container (list of forecast)
-     searchInputEl.value = '';                    //clear search field
-     fetchCoordinates();                      // Use named location to fetch co-ordinates to use in the weather forecast API
+     forecastContainerEl.textContent = '';                   //clear forecast container (list of forecast)
+     searchInputEl.value = '';                               //clear search field
+     //Store search value in local storage
+     fetchCoordinates();                                     // Use named city to fetch co-ordinates to use in the weather forecast API
    } else {
     console.log("  search is empty - bad")  
-    alert('Please enter a location');        //if location is falsy then request location    
+    alert('Please enter a location');                         //if location is falsy then request location     //!!!! Turn this into modal
    };
    return;
 };
@@ -54,7 +55,7 @@ function checkSearchEmpty(event) {
 function fetchCoordinates () {
     console.log ("\n\n\n > fetchCoordinates() called");
     var apiCoordinates = "http://api.openweathermap.org/geo/1.0/direct?q=" + search + "&limit=5&appid=" + apiKey;     // to get longitude/latitude info
-    console.log("  fetching coordinates from API ...");
+    console.log("  fetching coordinates from OpenWeather Geocoding API ...");
     fetch(apiCoordinates).then(function (response) {      
         if (response.ok) {
             console.log("  ... API Response received (see below)");
@@ -173,7 +174,7 @@ function displayForecast () {
   console.log (coordDataArray);
 
 // for loop to create forcast text, create 3 HTML elements and append
-  for (var i = 0; i < 50 || i < forecastDataArray.length; i = i+8) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
+  for (var i = 0; i < 50 || i < forecastDataArray.length; i = i+1) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
     
     // Declare var AEDT store date/time convert from Unix to AEDT
     var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // TO DO *** Can remove time at the end
@@ -194,7 +195,7 @@ function displayForecast () {
 
     var statusEl = document.createElement('span');                                        // Declare Var statusEl  - create new 'span' element
         statusEl.classList = 'flex-row align-center';                                     // Add classes to span element
-        statusEl.textContent = "**" + [i];
+        statusEl.textContent = " **" + [i];                          // Just for Hy's troubleshooting (i value)
         forecastEl.appendChild(statusEl);                                                 // Append statusEl (child) to forecastEl (parent)   
     
     forecastContainerEl.appendChild(forecastEl);                                           // Append forecastEl (parent) to forecastContainerEl (parent)
@@ -213,7 +214,7 @@ function displayForecast () {
 
 searchFormEl.addEventListener('submit', function(event) {
   console.log("\n\n\n ! userFormEl Clicked");    
-  checkSearchEmpty(event);
+  assessSearchValue(event);
 });
 
 
