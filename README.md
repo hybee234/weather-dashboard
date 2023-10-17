@@ -96,6 +96,7 @@ Extensive console logging has been embeeded across the application to capture im
 Extensive effort was invested into meaningful commentary
 * Within script.js and index.html
 
+
 I hope this makes for easier review for anyone taking a closer look. Appreciate any feedback
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -107,10 +108,12 @@ I hope this makes for easier review for anyone taking a closer look. Appreciate 
 * Javascript
 * Tailwind CSS Framework
 * FontAwesome
-* OpenWeather API
+* OpenWeather API (Geolocation and 5 day forecast)*
 * DayJS
 
-N/A
+ *It was particularly challenging to meet the user requirements utilising the data made available from the Openweather API in its raw form. I took the opportunity to practice the manipulation of data (javascript Objects and arrays) to shape data in a way that can be presented on the dashboard in a useful and meaningful way. I'm certain there are more efficient ways of achieving the same result but it has gotten to a state that I am happy with (considering the available data)
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Tests
