@@ -2,7 +2,7 @@ const searchFormEl = document.getElementById('search-form');
 const languageButtonsEl = document.getElementById('language-buttons'); //buttons to select JS, HTML, CSS
 const searchInputEl = document.getElementById('search-field');
 
-const currentWeatherTitleEl = document.getElementById('current-weather-title');         // Subtitle - heading for firecast one
+const currentWeatherContainerEl = document.getElementById('current-weather-container');         // Subtitle - heading for firecast one
 //const locationSpanEl = document.getElementById('location-display');                 // name that comes after "weather forecaast for:"
 const currentEl = document.getElementById('current-weather')
 const forecastContainerEl = document.getElementById('forecast-container');  // Forecast cards beyond first one dynamically appending to this
@@ -595,20 +595,16 @@ var displayForecast = () => {
     console.log("\n\n\n > displayForecast() Called");  
     console.log("  search term used = '" + searchCity + "'"); 
     
-    currentEl.innerHTML = ""            // Current weather Container
+    currentWeatherContainerEl.innerHTML = ""                // Current weather Container
     forecastContainerEl.innerHTML = ""      // Forecast Container
 
-    footerTextEl.textContent = `Latitude: ${lat}, Longitute ${lon}`;  // Show Latitidue/Longitude in footer 
+    footerTextEl.textContent = `Latitude: ${lat}, Longitute ${lon}`;    // Show Latitidue/Longitude in footer 
     console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
   
     //- Render first card -//
-
-    // *** TODO *** FIRST CARD SHOULD BE TAKEN FROM SUBSETARRAY - IT IS CURRENT DATA - GET RID OF FOR LOOP, just assign values directly from forecastDataArray
-   
-    //AEDT = (dayjs.unix(forecastDataArray.list[0].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')
     AEDT = (dayjs.unix(forecastDataArray.list[0].dt).format('dddd, DD MMMM YYYY, HH:mm:ss A'))
 
-    if (stateAPI) {
+    if (stateAPI) {    //Hide state if API returns an undefined value
         var currentCity = `${nameAPI}, ${stateAPI} (${countryAPI})` 
     } else {
         var currentCity = `${nameAPI} (${countryAPI})` 
@@ -620,12 +616,15 @@ var displayForecast = () => {
     var currentWind = "Wind: " + forecastDataArray.list[0].wind.speed + " km/hr";
     var currentHummidity = "Humidity: " + forecastDataArray.list[0].main.humidity + "%";
     var currentIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[0].weather[0].icon + ".png"
-
-    currentWeatherTitleEl.textContent = "Current Weather in:"
     
+        var currentWeatherTitleEl = document.createElement('h2');
+        currentWeatherTitleEl.textContent = "Current Weather:"
+        currentWeatherTitleEl.classList.add("text-white", "bg-blue-800", "p-2", "mb-2", "w-full", "text-2xl")
+        currentWeatherContainerEl.appendChild(currentWeatherTitleEl);
+        
         var currentCardEl = document.createElement('div');
         currentCardEl.classList.add ("flex", "flex-wrap", "justify-center", "shrink", "grow")                                                                                                
-        currentEl.appendChild(currentCardEl);                                                                                                 
+        currentWeatherContainerEl.appendChild(currentCardEl);                                                                                                 
 
             var currentCityEl = document.createElement('div')
             currentCityEl.classList.add("bg-blue-100", "font-bold", "text-3xl", "p-1", "text-center", "items-center", "justify-center", "w-full")                                                                       
