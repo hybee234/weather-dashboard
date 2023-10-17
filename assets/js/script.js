@@ -1,11 +1,13 @@
-const searchFormEl = document.querySelector('#search-form'); 
-const languageButtonsEl = document.querySelector('#language-buttons'); //buttons to select JS, HTML, CSS
-const searchInputEl = document.querySelector('#search-field');
+const searchFormEl = document.getElementById('search-form'); 
+const languageButtonsEl = document.getElementById('language-buttons'); //buttons to select JS, HTML, CSS
+const searchInputEl = document.getElementById('search-field');
 
-const forecastOneEl = document.getElementById('forecast-one')
+const currentWeatherTitleEl = document.getElementById('current-weather-title');         // Subtitle - heading for firecast one
+//const locationSpanEl = document.getElementById('location-display');                 // name that comes after "weather forecaast for:"
+const currentEl = document.getElementById('current-weather')
 const forecastContainerEl = document.getElementById('forecast-container');  // Forecast cards beyond first one dynamically appending to this
 
-const locationSpanEl = document.querySelector('#location-display'); // name that comes after "weather forecaast for:"
+
 const modalEl =  document.getElementById('modal');                                    // Modal Window
 const modalTitleEl = document.getElementById('modal-title');                         // Modal Title Text
 const modalLineOneEl = document.getElementById('modal-line-one');                    // Modal Pragraph line one
@@ -16,6 +18,7 @@ const previousSearchContainerEl = document.getElementById('prev-search-cont');  
 const previousSearchButtonContainerEl = document.getElementById('prev-search-button-container');  //Container for previous search buttons
 const clearHistoryBtn = document.getElementById('clear-history');                        //Container for previous search buttons
 const footerTextEl = document.getElementById('footer-text');                            // Text at the bottom of footer
+
 
 const apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6";
 var lat = "-37.81373321550253";                   // latitude to be populated by co-ordinate API (Default is Melbourne)
@@ -28,6 +31,10 @@ var stateAPI = "";                                 // to store state name from G
 var countryAPI = "";                               // to store Country code value from Geolocation API
 var previousSearchArray = [];                     // Array to store historical searches (and interact with local storage)
 var AEDT = ""                                     // Forecast date converted to AEDT
+var subsetArray = [];                             // Subset of data from forecastDataArray
+var uniqueDateArray = [];                           // subSetArray manipulated to group readings from the same date together - allowing for sorting to determine max/min value
+var arrayForRendering = {"index": [{}]};       // data manipulated in manipulateDate() function is used to construct this array for final rendering
+
 //----------------------------------//
 //- Function - Assess Search Value -//
 //----------------------------------//
@@ -118,9 +125,6 @@ var fetchForecast = () => {
     var apiForecast = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&cnt=80&appid=${apiKey}&exclude=minutely,hourly,alert`;
     console.log(apiForecast);
 
-    
-    
-
     console.log("  fetching forecast from API..");  
     fetch(apiForecast).then(function (response) {      
         if (response.ok) {
@@ -175,7 +179,7 @@ var submitStorage = () => {
         previousSearchArray.push(searchCity);    // Append last successful search to array
         console.log("  New search term, adding to local storage")
         console.log(previousSearchArray);
-        localStorage.setItem('locationforecast', JSON.stringify(previousSearchArray));                             // Store successful searches into Local storage (store "search" into Key "locationforecast")
+        localStorage.setItem('locationforecast', JSON.stringify(previousSearchArray));  // Store successful searches into Local storage (store "search" into Key "locationforecast")
         renderHistoryButtons();
     } else {
         console.log("  " + searchCity + " already appears in previous searches - not adding to local storage")    
@@ -208,28 +212,42 @@ var retrieveStorage = () => {
 //------------------------------//
 //- Function - Manipulate data -//
 //------------------------------//
+
+// OpenweatherAPI provides 3 hourly forecasts up to 5 days ahead of time
+// Selecting the best values to display on each day of the forecast is challenging,
+// (requirements do not specify and weather forecast websites generally don't provide that level of detail)
+// The below specifications have been arbitarily determined.
+// The Data manipulation in this function is aimed to:
+    // Group forecasts into days
+    // Determing the maximum Temperature for the day
+    // Determine minimum Temperature for the day
+    // Determine maximum humidity for the day
+    // Determine maximum wind for the day
+    // Obtain the icon relating to the maximum Temperature
+
 var manipulateData = () => {
-    console.log("\n\n\n > manipulateData() Called")
+    console.log("\n\n\n > manipulateData() Called")    
 
-//  AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('ddd, D/M/YYYY, HH:mm:ss A') // Declare var AEDT store date/time convert from Unix to AEDT, set hour, min, sec, ms to zero
+        //---------------//
+        //- subsetArray -//
+        //---------------//
 
-    // Declare subsetArray (Javascript Object) - subsetArray storing subset of data from forecastDataArray for use of this page (forecastDataArray contains API data)
-    var subsetArray = [
-        // {"date":"17/10/2023", "temp":"23.4", "tempMin":"11.0", "tempMax":"28.0", "wind":"7", "humidity":"60"},
-        // {"date":"18/10/2023", "temp":"25.5", "tempMin":"12.0", "tempMax":"30.0", "wind":"8", "humidity":"65"},
-        // {"date":"18/10/2023", "temp":"25.5", "tempMin":"12.0", "tempMax":"30.0", "wind":"8", "humidity":"65"},
-    ];
-  
-    // Populate subsetArray with Data 
+// subSetArray is a subset of forecastDataArray (forecastDataArray contains the full response from the weatherforecast API response)
+// the purpose of subSetArray is to pull data points of interest (data that will be used on the weather dashboard with some manipulation (i.e. date and icon))
+// the data in subSetArray will be further manipulated to eventually produce the forecast
+
+    subsetArray = []; // clear subsetArray
+
+    // populate subsetArray with data from forecastDataArray - transforming date and icon 
     for (let i=0; i< forecastDataArray.list.length; i = i+1) {
         subsetArray.push(
             {
-            "date": ((dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')),
-            "temp": forecastDataArray.list[i].main.temp,
+            "date": ((dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')),            
             "tempMin": forecastDataArray.list[i].main.temp_min,
             "tempMax": forecastDataArray.list[i].main.temp_max,
-            "wind": "Wind: " + forecastDataArray.list[i].wind.speed + " km/hr",
-            "humidity": "Humidity: " + forecastDataArray.list[i].main.humidity + "%",
+            "wind": forecastDataArray.list[i].wind.speed,
+            "humidity": forecastDataArray.list[i].main.humidity,
+            "temp": forecastDataArray.list[i].main.temp,
             "icon": "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
             }
         )
@@ -238,11 +256,15 @@ var manipulateData = () => {
     console.log("  subsetArray:\n  ------------");
     console.log(subsetArray);
 
-    // console.log ("  forecastDataArray: \n  ------------------")       
-    // console.log(forecastDataArray)
+        //-------------------//
+        //- uniqueDateArray -//
+        //-------------------//
+
+// uniqueDateArray is populated by data from subsetArray
+// the purpose of uniqueDateArray is to store the data from subsetArray grouped by Date ("zero'd" or rounded down to 0000hrs)
+// data organised this way allows the use of sort methods to determine maximum and minimum values within a day
     
-    //generate array of unique dates to carry out further data manipulation //declare and clear uniqueDateArray
-    var uniqueDateArray = {
+    uniqueDateArray = { //clear uniqueDateArray 
         "date": [],
         "day0": [],
         "day1": [],
@@ -250,24 +272,25 @@ var manipulateData = () => {
         "day3": [],
         "day4": [],
         "day5": []
-    };  
+    }; 
 
+    //poulate uniqueDateArray.date with unique date values that appear in subsetArray
     for (let j = 0; j < subsetArray.length;j++) {
-        let testDate = uniqueDateArray.date.indexOf(subsetArray[j].date)
-        if (testDate === parseInt(-1)) {
+        let assessDate = uniqueDateArray.date.indexOf(subsetArray[j].date)
+        if (assessDate === parseInt(-1)) {
             uniqueDateArray.date.push(subsetArray[j].date)
             // console.log("  New unique date, adding to uniqueDateArray")
-            // console.log(uniqueDateArray);
-        
+            // console.log(uniqueDateArray);        
         } else {
             // console.log("  " + subsetArray[j].date + " already appears in uniqueDate - not adding")
             }
-    }
+    };
     
-    //push values into respactive days in uniqueDateArray
+    // Assess all date values in subSetArray and push them into corresponding arrays in uniqueDateArray (series of nested if statements)
+    
     for (let k = 0; k < subsetArray.length; k = k+1) {
 
-        if (subsetArray[k].date === uniqueDateArray.date[0]) {
+        if (subsetArray[k].date === uniqueDateArray.date[0]) {  
             uniqueDateArray.day0.push(subsetArray[k])
             // console.log("push 0")
         } else
@@ -297,169 +320,264 @@ var manipulateData = () => {
             // console.log("push 5")
         } else {
             // console.log("not pushing")
-        }
-    }
+        };
+    };
     console.log ("  uniqueDateArray: \n  ----------------")   
     console.log(uniqueDateArray)
+    
+    // With uniqueDateArray constructed, the values required for forecasting can be determined with a series of sorting to determine maximum and minmum values
+    // All variables used across Day 0 to Day 5 will be used to construct a final javascript object "arrayForRendering" with data structure designed to support a "for loop" to dynamically add elements to the HTML
+    // Note: Day 5 data is not always available for the API - an if statement is in place to manage any errors
 
-    //------------------------------------------------------//
-    //- Max and Minum Temperature - day[no]Max / day[no]Min-//
-    //------------------------------------------------------//
-
-    //Day Zero Max Temp
-    let sortDayZeroMax = uniqueDateArray.day0;
-    sortDayZeroMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Sort in descending (a greater than b if in sequence)\
-    var dayZeroMax = uniqueDateArray.day0[0].tempMax;
-    console.log("Day ZERO Max Temp = " + dayZeroMax);
-    var dayZeroHumidity = uniqueDateArray.day0[0].humidity;
-    console.log("Day ZERO Humidity = " + dayZeroHumidity)
+    //---------//
+    //- Day 0 -//
+    //---------//
+    
+    //Max Temp//
+    uniqueDateArray.day0.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order)
+    var dayZeroMaxTemp = `High: ${uniqueDateArray.day0[0].tempMax}\xB0C`;      
+    console.log(`  Day ZERO Max Temp = ${dayZeroMaxTemp}`); 
+    
+    //Icon//
+    uniqueDateArray.day0.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order) - Icon based off highest Temperature
     var dayZeroIcon = uniqueDateArray.day0[0].icon;
-    console.log("Day ZERO Icon = " + dayZeroIcon)
-    console.log(sortDayZeroMax);
+    console.log(`  Day ZERO Icon ${dayZeroIcon}`);
 
-    //Day Zero Min Temp
-    let sortDayZeroMin = uniqueDateArray.day0;
-    sortDayZeroMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Sort in ascenmding (a less than b if in sequence)
-    var dayZeroMin = uniqueDateArray.day0[0].tempMin;
-    console.log("Day ZERO Min Temp = " + dayZeroMin);
-    console.log(sortDayZeroMin);
+    //Min Temp//  
+    uniqueDateArray.day0.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Lowest value in index[0] (ascending order)
+    var dayZeroMinTemp = `Low: ${uniqueDateArray.day0[0].tempMin}\xB0C`;
+    console.log(`  Day ZERO Min Temp = ${dayZeroMinTemp}`);    
 
-    //Day ONE Max Temp
-    let sortDayOneMax = uniqueDateArray.day1;
-    sortDayOneMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-    var dayOneMax = uniqueDateArray.day1[0].tempMax;
-    console.log("Day ONE Max Temp = " + dayOneMax);
-    console.log(sortDayOneMax);    
+    //Max Wind//
+    uniqueDateArray.day0.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayZeroMaxWind = `Wind: ${uniqueDateArray.day0[0].wind} km/hr`;
+    console.log(`  Day ZERO Max Wind = ${dayZeroMaxWind}`); 
 
-    // //Day ONE Min Temp
-    let sortDayOneMin = uniqueDateArray.day1;
-    sortDayOneMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
-    var dayOneMin = uniqueDateArray.day1[0].tempMin;
-    console.log("Day ONE Min Temp = " + dayOneMin);
-    console.log(sortDayOneMin);
+    //Max Humidity//
+    uniqueDateArray.day0.sort((a,b) => (a.humidity < b.humidity) ? 1 : (a.humidity > b.humidity) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayZeroMaxHumidity = `Humidity: ${uniqueDateArray.day0[0].humidity}%`;
+    console.log(`  Day ZERO Max Humidity = ${dayZeroMaxHumidity}`); 
 
-    //Day TWO Max Temp
-    let sortDayTwoMax = uniqueDateArray.day2;
-    sortDayTwoMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-    var dayTwoMax = uniqueDateArray.day2[0].tempMax;
-    console.log("Day TWO Max Temp = " + dayTwoMax); 
-    console.log(sortDayTwoMax);
-
-    //Day TWO Min Temp
-    let sortDayTwoMin = uniqueDateArray.day2;
-    sortDayTwoMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
-    var dayTwoMin = uniqueDateArray.day2[0].tempMin;
-    console.log("Day TWO Min Temp = " + dayTwoMin);
-    console.log(sortDayTwoMin);
-     
-    //Day THREE Max Temp
-    let sortDayThreeMax = uniqueDateArray.day3;
-    sortDayThreeMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-    var dayThreeMax = uniqueDateArray.day3[0].tempMax;
-    console.log("Day THREE Max Temp = " + dayThreeMax); 
-    console.log(sortDayThreeMax);
+    //---------//
+    //- Day 1 -//
+    //---------//
     
-    //Day THREE Min Temp
-    let sortDayThreeMin = uniqueDateArray.day3;
-    sortDayThreeMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
-    var dayThreeMin = uniqueDateArray.day3[0].tempMin;
-    console.log("Day THREE Min Temp = " + dayThreeMin);
-    console.log(sortDayThreeMin);
-
-    //Day FOUR Max Temp
-    let sortDayFourMax = uniqueDateArray.day4;
-    sortDayFourMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-    var dayFourMax = uniqueDateArray.day4[0].tempMax;
-    console.log("Day FOUR Max Temp = " + dayFourMax); 
-    console.log(sortDayFourMax);
+    //Max Temp//
+    uniqueDateArray.day1.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order)
+    var dayOneMaxTemp = `High: ${uniqueDateArray.day1[0].tempMax}\xB0C`;      
+    console.log(`\n  Day ONE Max Temp = ${dayOneMaxTemp}`); 
     
-    //Day FOUR Min Temp
-    let sortDayFourMin = uniqueDateArray.day4;
-    sortDayFourMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
-    var dayFourMin = uniqueDateArray.day4[0].tempMin;
-    console.log("Day FOUR Min Temp = " + dayFourMin);
-    console.log(sortDayFourMin);
+    //Icon//
+    uniqueDateArray.day1.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order) - Icon based off highest Temperature
+    var dayOneIcon = uniqueDateArray.day1[0].icon;
+    console.log(`  Day ONE Icon ${dayOneIcon}`);
 
-    //Day FIVE Max Temp
-    let sortDayFiveMax = uniqueDateArray.day5;
-    sortDayFiveMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-    var dayFiveMax = uniqueDateArray.day5[0].tempMax;
-    console.log("Day FIVE Max Temp = " + dayFiveMax); 
-    console.log(sortDayFiveMax);
+    //Min Temp//  
+    uniqueDateArray.day1.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Lowest value in index[0] (ascending order)
+    var dayOneMinTemp = `Low: ${uniqueDateArray.day1[0].tempMin}\xB0C`;
+    console.log(`  Day ONE Min Temp = ${dayOneMinTemp}`);    
+
+    //Max Wind//
+    uniqueDateArray.day1.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayOneMaxWind = `Wind: ${uniqueDateArray.day1[0].wind} km/hr`;
+    console.log(`  Day ONE Max Wind = ${dayOneMaxWind}`); 
+
+    //Max Humidity//
+    uniqueDateArray.day1.sort((a,b) => (a.humidity < b.humidity) ? 1 : (a.humidity > b.humidity) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayOneMaxHumidity = `Humidity: ${uniqueDateArray.day1[0].humidity}%`;
+    console.log(`  Day ONE Max Humidity = ${dayOneMaxHumidity}`); 
+
+    //---------//
+    //- Day 2 -//
+    //---------//
     
-    //Day FIVE Min Temp
-    let sortDayFiveMin = uniqueDateArray.day5;
-    sortDayFiveMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
-    var dayFiveMin = uniqueDateArray.day5[0].tempMin;
-    console.log("Day FIVE Min Temp = " + dayFiveMin);
-    console.log(sortDayFiveMin);
+    //Max Temp//
+    uniqueDateArray.day2.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order)
+    var dayTwoMaxTemp = `High: ${uniqueDateArray.day2[0].tempMax}\xB0C`;      
+    console.log(`  Day TWO Max Temp = ${dayTwoMaxTemp}`); 
+    
+    //Icon//
+    uniqueDateArray.day2.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order) - Icon based off highest Temperature
+    var dayTwoIcon = uniqueDateArray.day2[0].icon;
+    console.log(`  Day TWO Icon ${dayTwoIcon}`);
 
-    //-----------------------------//
-    //- Max Wind - day[no]MaxWind -//
-    //-----------------------------//
+    //Min Temp//  
+    uniqueDateArray.day2.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Lowest value in index[0] (ascending order)
+    var dayTwoMinTemp = `Low: ${uniqueDateArray.day2[0].tempMin}\xB0C`;
+    console.log(`  Day TWO Min Temp = ${dayTwoMinTemp}`);    
 
-        //Day ZERO Max Wind
-        let sortDayZeroMaxWind = uniqueDateArray.day0;
-        sortDayZeroMaxWind.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-        var dayZeroMaxWind = uniqueDateArray.day0[0].wind;
-        console.log("Day ZERO Max Wind = " + dayZeroMaxWind); 
-        console.log(sortDayZeroMaxWind);
+    //Max Wind//
+    uniqueDateArray.day2.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayTwoMaxWind = `Wind: ${uniqueDateArray.day2[0].wind} km/hr`;
+    console.log(`  Day TWO Max Wind = ${dayTwoMaxWind}`); 
 
-
-
-
-
-
-    //Day FIVE Max Wind
-    let sortDayFiveMaxWind = uniqueDateArray.day5;
-    sortDayFiveMaxWind.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-    var dayFiveMaxWind = uniqueDateArray.day5[0].wind;
-    console.log("Day FIVE Max Wind = " + dayFiveMaxWind); 
-    console.log(sortDayFiveMaxWind);
-
-    //----------------//
-    //- Max Humidity -//
-    //----------------//
+    //Max Humidity//
+    uniqueDateArray.day2.sort((a,b) => (a.humidity < b.humidity) ? 1 : (a.humidity > b.humidity) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayTwoMaxHumidity = `Humidity: ${uniqueDateArray.day2[0].humidity}%`;
+    console.log(`  Day TWO Max Humidity = ${dayTwoMaxHumidity}`); 
 
 
-    // Openweather array - values of interest
-    // Date = forecastDataArray.list[i].dt
-    // Temp = forecastDataArray.list[i].main.temp + "\xB0 C";
-    // MinTemp = "Min: " + forecastDataArray.list[i].main.temp_min + "\xB0 C";
-    // MaxTemp = "High: " + forecastDataArray.list[i].main.temp_max + "\xB0 C";
-    // Wind = "Wind: " + forecastDataArray.list[i].wind.speed + " km/hr";
-    // Hummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
-    // Icon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"  
-    //day1Array[i].date = "19/10/2023"  // This works to replace values! (store "19/10/2023 in day1Array[i].date")
+    //---------//
+    //- Day 3 -//
+    //---------//
+    
+    //Max Temp//
+    uniqueDateArray.day3.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order)
+    var dayThreeMaxTemp = `High: ${uniqueDateArray.day3[0].tempMax}\xB0C`;      
+    console.log(`\n  Day THREE Max Temp = ${dayThreeMaxTemp}`); 
+    
+    //Icon//
+    uniqueDateArray.day3.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order) - Icon based off highest Temperature
+    var dayThreeIcon = uniqueDateArray.day3[0].icon;
+    console.log(`  Day THREE Icon ${dayThreeIcon}`);
 
-    // define al the variables and create a final array
+    //Min Temp//  
+    uniqueDateArray.day3.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Lowest value in index[0] (ascending order)
+    var dayThreeMinTemp = `Low: ${uniqueDateArray.day3[0].tempMin}\xB0C`;
+    console.log(`  Day THREE Min Temp = ${dayThreeMinTemp}`);    
 
-var arrayForRendering = 
-    {"index": [ 
-        {"date": ""},
-        {"iconURL": ""},
-        {"maxTemp": ""},
-        {"minTemp": ""},
-        {"maxWind": ""},
-        {"maxHumidity": ""}
-    ]};
+    //Max Wind//
+    uniqueDateArray.day3.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayThreeMaxWind = `Wind: ${uniqueDateArray.day3[0].wind} km/hr`;
+    console.log(`  Day THREE Max Wind = ${dayThreeMaxWind}`); 
 
-//Up to here - difficulty building the array //
-// console.log(uniqueDateArray.date[0])
-// console.log(arrayForRendering)
+    //Max Humidity//
+    uniqueDateArray.day3.sort((a,b) => (a.humidity < b.humidity) ? 1 : (a.humidity > b.humidity) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayThreeMaxHumidity = `Humidity: ${uniqueDateArray.day3[0].humidity}%`;
+    console.log(`  Day THREE Max Humidity = ${dayThreeMaxHumidity}`); 
+
+    //---------//
+    //- Day 4 -//
+    //---------//
+    
+    //Max Temp//
+    uniqueDateArray.day4.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order)
+    var dayFourMaxTemp = `High: ${uniqueDateArray.day4[0].tempMax}\xB0C`;      
+    console.log(`\n  Day FOUR Max Temp = ${dayFourMaxTemp}`); 
+    
+    //Icon//
+    uniqueDateArray.day4.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order) - Icon based off highest Temperature
+    var dayFourIcon = uniqueDateArray.day4[0].icon;
+    console.log(`  Day FOUR Icon ${dayFourIcon}`);
+
+    //Min Temp//  
+    uniqueDateArray.day4.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Lowest value in index[0] (ascending order)
+    var dayFourMinTemp = `Low: ${uniqueDateArray.day4[0].tempMin}\xB0C`;
+    console.log(`  Day FOUR Min Temp = ${dayFourMinTemp}`);    
+
+    //Max Wind//
+    uniqueDateArray.day4.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayFourMaxWind = `Wind: ${uniqueDateArray.day4[0].wind} km/hr`;
+    console.log(`  Day FOUR Max Wind = ${dayFourMaxWind}`); 
+
+    //Max Humidity//
+    uniqueDateArray.day4.sort((a,b) => (a.humidity < b.humidity) ? 1 : (a.humidity > b.humidity) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayFourMaxHumidity = `Humidity: ${uniqueDateArray.day4[0].humidity}%`;
+    console.log(`  Day FOUR Max Humidity = ${dayFourMaxHumidity}`); 
+
+    //---------//
+    //- Day 5 -//
+    //---------//
+      
+    if (uniqueDateArray.length >= 6) {
+    //Max Temp//
+    uniqueDateArray.day5.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order)
+    var dayFiveMaxTemp = `High: ${uniqueDateArray.day5[0].tempMax}\xB0C`;      
+    console.log(`\n  Day FOU5 Max Temp = ${dayFiveMaxTemp}`); 
+    
+    //Icon//
+    uniqueDateArray.day5.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Highest value in index[0] (descending order) - Icon based off highest Temperature
+    var dayFiveIcon = uniqueDateArray.day5[0].icon;
+    console.log(`  Day FIVE Icon ${dayFiveIcon}`);
+
+    //Min Temp//  
+    uniqueDateArray.day5.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Lowest value in index[0] (ascending order)
+    var dayFiveMinTemp = `Low: ${uniqueDateArray.day5[0].tempMin}\xB0C`;
+    console.log(`  Day FIVE Min Temp = ${dayFiveMinTemp}`);    
+
+    //Max Wind//
+    uniqueDateArray.day5.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayFiveMaxWind = `Wind: ${uniqueDateArray.day5[0].wind} km/hr`;
+    console.log(`  Day FIVE Max Wind = ${dayFiveMaxWind}`); 
+
+    //Max Humidity//
+    uniqueDateArray.day5.sort((a,b) => (a.humidity < b.humidity) ? 1 : (a.humidity > b.humidity) ?-1 :0 );   // Highest value in index[0] (descending order)
+    var dayFiveMaxHumidity = `Humidity: ${uniqueDateArray.day5[0].humidity}%`;
+    console.log(`  Day FIVE Max Humidity = ${dayFiveMaxHumidity}`); 
+    
+    } else {
+    console.log(`\n  uniqueDataArray.date.length <6, No data to render day 5`)
+};
+
+        //-------------------//
+        //- uniqueDateArray -//
+        //-------------------//
+
+// uniqueDateArray is populated by data from subsetArray
+// the purpose of uniqueDateArray is to store the data from subsetArray grouped by Date ("zero'd" or rounded down to 0000hrs)
+// data organised this way allows the use of sort methods to determine maximum and minimum values within a day
+
+arrayForRendering =      
+        {"index": [
+            {"date": ""},
+            {"date": ""},
+            {"date": ""},
+            {"date": ""},
+            {"date": ""},
+            {"date": ""}     
+        ]};
 
 //Build array - Day 0
-    arrayForRendering.index[0].date = uniqueDateArray.date[0]
-    arrayForRendering.index[0].icon = dayZeroIcon
-    arrayForRendering.index[0].maxTemp = "Max: " + dayZeroMax + "\xB0 C"
-    arrayForRendering.index[0].minTemp = "Min: " + dayZeroMin + "\xB0 C"
-    arrayForRendering.index[0].humidity = dayZeroHumidity + "%"
-    arrayForRendering.index[0].wind = dayZeroMaxWind + "%"
+    arrayForRendering.index[0].date = uniqueDateArray.date[0];
+    arrayForRendering.index[0].iconURL = dayZeroIcon;
+    arrayForRendering.index[0].maxTemp = dayZeroMaxTemp;
+    arrayForRendering.index[0].minTemp = dayZeroMinTemp;
+    arrayForRendering.index[0].maxHumidity = dayZeroMaxHumidity;
+    arrayForRendering.index[0].maxWind = dayZeroMaxWind;
 
+//Build array - Day 1
+    arrayForRendering.index[1].date = uniqueDateArray.date[1];
+    arrayForRendering.index[1].iconURL = dayOneIcon;
+    arrayForRendering.index[1].maxTemp = dayOneMaxTemp;
+    arrayForRendering.index[1].minTemp = dayOneMinTemp;
+    arrayForRendering.index[1].maxHumidity = dayOneMaxHumidity;
+    arrayForRendering.index[1].maxWind = dayOneMaxWind;
 
+//Build array - Day 2
+    arrayForRendering.index[2].date = uniqueDateArray.date[2];
+    arrayForRendering.index[2].iconURL = dayTwoIcon;
+    arrayForRendering.index[2].maxTemp = dayTwoMaxTemp;
+    arrayForRendering.index[2].minTemp = dayTwoMinTemp;
+    arrayForRendering.index[2].maxHumidity = dayTwoMaxHumidity;
+    arrayForRendering.index[2].maxWind = dayTwoMaxWind;
 
+//Build array - Day 3
+    arrayForRendering.index[3].date = uniqueDateArray.date[3];
+    arrayForRendering.index[3].iconURL = dayThreeIcon;
+    arrayForRendering.index[3].maxTemp = dayThreeMaxTemp;
+    arrayForRendering.index[3].minTemp = dayThreeMinTemp;
+    arrayForRendering.index[3].maxHumidity = dayThreeMaxHumidity;
+    arrayForRendering.index[3].maxWind = dayThreeMaxWind;
 
-    
+//Build array - Day 4
+    arrayForRendering.index[4].date = uniqueDateArray.date[4];
+    arrayForRendering.index[4].iconURL = dayFourIcon;
+    arrayForRendering.index[4].maxTemp = dayFourMaxTemp;
+    arrayForRendering.index[4].minTemp = dayFourMinTemp;
+    arrayForRendering.index[4].maxHumidity = dayFourMaxHumidity;
+    arrayForRendering.index[4].maxWind = dayFourMaxWind;
+
+//Build array - Day 5
+if (uniqueDateArray.length >= 6) {
+    arrayForRendering.index[5].date = uniqueDateArray.date[5];
+    arrayForRendering.index[5].iconURL = dayFiveIcon;
+    arrayForRendering.index[5].maxTemp = dayFiveMaxTemp;
+    arrayForRendering.index[5].minTemp = dayFiveMinTemp;
+    arrayForRendering.index[5].maxHumidity = dayFiveMaxHumidity;
+    arrayForRendering.index[5].maxWind = dayFiveMaxWind;
+} else {
+    console.log(`  uniqueDataArray.date.length <6, no data to add to arrayForRendering`)
+}
     console.log ("  arrayForRendering: \n  ----------------")   
     console.log (arrayForRendering)
 
@@ -477,72 +595,79 @@ var displayForecast = () => {
     console.log("\n\n\n > displayForecast() Called");  
     console.log("  search term used = '" + searchCity + "'"); 
     
-    forecastOneEl.innerHTML = ""            // ForecastOne Container
+    currentEl.innerHTML = ""            // Current weather Container
     forecastContainerEl.innerHTML = ""      // Forecast Container
 
     footerTextEl.textContent = `Latitude: ${lat}, Longitute ${lon}`;  // Show Latitidue/Longitude in footer 
     console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
   
     //- Render first card -//
-    for (let i=0; i<1 ; i=i+1) {
 
-    AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')
+    // *** TODO *** FIRST CARD SHOULD BE TAKEN FROM SUBSETARRAY - IT IS CURRENT DATA - GET RID OF FOR LOOP, just assign values directly from forecastDataArray
+   
+    //AEDT = (dayjs.unix(forecastDataArray.list[0].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')
+    AEDT = (dayjs.unix(forecastDataArray.list[0].dt).format('dddd, DD MMMM YYYY, HH:mm:ss A'))
 
-    var forecastOneCity = nameAPI + ", " + stateAPI + ", " + countryAPI 
-    var forecastOneDate = AEDT;
-    var forecastOneTemp = forecastDataArray.list[i].main.temp + "\xB0 C";
-    var forecastOneMinTemp = "Low: " + forecastDataArray.list[i].main.temp_min + "\xB0 C";
-    var forecastOneMaxTemp = "High: " + forecastDataArray.list[i].main.temp_max + "\xB0 C";
-    var forecastOneWind = "Wind: " + forecastDataArray.list[i].wind.speed + " km/hr";
-    var forecastOneHummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
-    var forecastOneIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
+    if (stateAPI) {
+        var currentCity = `${nameAPI}, ${stateAPI} (${countryAPI})` 
+    } else {
+        var currentCity = `${nameAPI} (${countryAPI})` 
+    }    
+    var currentDateTime = AEDT;
+    var currentTemp = forecastDataArray.list[0].main.temp + "\xB0 C";
+    var currentMinTemp = "Low: " + forecastDataArray.list[0].main.temp_min + "\xB0 C";
+    var currentMaxTemp = "High: " + forecastDataArray.list[0].main.temp_max + "\xB0 C";
+    var currentWind = "Wind: " + forecastDataArray.list[0].wind.speed + " km/hr";
+    var currentHummidity = "Humidity: " + forecastDataArray.list[0].main.humidity + "%";
+    var currentIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[0].weather[0].icon + ".png"
 
-        var forecastCardOneEl = document.createElement('div');
-        forecastCardOneEl.classList.add ("flex", "flex-wrap", "justify-center", "shrink", "grow")                                                                                        
-        forecastOneEl.appendChild(forecastCardOneEl);                                                                                                 
+    currentWeatherTitleEl.textContent = "Current Weather in:"
+    
+        var currentCardEl = document.createElement('div');
+        currentCardEl.classList.add ("flex", "flex-wrap", "justify-center", "shrink", "grow")                                                                                                
+        currentEl.appendChild(currentCardEl);                                                                                                 
 
-            var forecastDateOneEl = document.createElement('div')
-            forecastDateOneEl.classList.add("bg-blue-100", "font-bold", "text-left", "text-3xl", "p-2", "text-center", "items-center", "justify-center", "flex", "flex-wrap", "grow", "shrink")                                                                       
-            forecastDateOneEl.textContent = forecastOneCity + " (" + forecastOneDate  + ")"
-            forecastCardOneEl.appendChild(forecastDateOneEl);                                                                                          
+            var currentCityEl = document.createElement('div')
+            currentCityEl.classList.add("bg-blue-100", "font-bold", "text-3xl", "p-1", "text-center", "items-center", "justify-center", "w-full")                                                                       
+            currentCityEl.textContent = currentCity;
+            currentCardEl.appendChild(currentCityEl);                                                                                          
 
-            var forecastIconOneEl = document.createElement('div')
-            forecastIconOneEl.classList.add("bg-blue-100", "flex", "justify-center", "text-center", "items-center", "w-4/5")
-            forecastDateOneEl.appendChild(forecastIconOneEl);                                                                                          
+            var currentDateTimeEl = document.createElement('div')
+            currentDateTimeEl.classList.add("bg-blue-100", "font-bold", "text-xl", "p-1", "text-center", "items-center", "justify-center", "w-full")                                                                       
+            currentDateTimeEl.textContent = currentDateTime;
+            currentCardEl.appendChild(currentDateTimeEl);   
 
-                var forecastIconOneLink = document.createElement('img')
-                forecastIconOneLink.classList.add("bg-blue-300", "text-center", "object-fill", "w-24", "items-center")                                                                       
-                forecastIconOneLink.src = forecastOneIcon;                
-                forecastIconOneEl.appendChild(forecastIconOneLink);     
+            var currentIconEl = document.createElement('div')
+            currentIconEl.classList.add("bg-blue-100", "flex", "justify-center", "text-center", "items-center", "w-4/5", "m-2")
+            currentCardEl.appendChild(currentIconEl);                                                                                          
 
-            var forecastTempOneEl = document.createElement('div')
-            forecastTempOneEl.classList.add("forecast-top-rounded", "bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")
-            forecastTempOneEl.textContent = "Temp: " + forecastOneTemp            
-            forecastCardOneEl.appendChild(forecastTempOneEl);    
+                var currentIconLink = document.createElement('img')
+                currentIconLink.classList.add("bg-blue-300", "text-center", "object-fill", "w-24", "items-center")                                                                       
+                currentIconLink.src = currentIcon;                
+                currentIconEl.appendChild(currentIconLink);     
+
+            var currentTempEl = document.createElement('div')
+            currentTempEl.classList.add("forecast-top-rounded", "bg-blue-200", "w-4/5", "text-center", "text-xl", "p-1")
+            currentTempEl.textContent = "Temp: " + currentTemp            
+            currentCardEl.appendChild(currentTempEl);    
            
-            var forecastTempHighLowOneEl = document.createElement('div')
-            forecastTempHighLowOneEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")                                                                       
-            forecastTempHighLowOneEl.textContent = `${forecastOneMinTemp} / ${forecastOneMaxTemp}`
-            forecastCardOneEl.appendChild(forecastTempHighLowOneEl);    
+            var currentMinMaxTempEl = document.createElement('div')
+            currentMinMaxTempEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl")                                                                       
+            currentMinMaxTempEl.textContent = `${currentMinTemp} / ${currentMaxTemp}`
+            currentCardEl.appendChild(currentMinMaxTempEl);    
 
-            var forecastWindOneEl = document.createElement('div')
-            forecastWindOneEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")                                                                       
-            forecastWindOneEl.textContent = forecastOneWind;
-            forecastCardOneEl.appendChild(forecastWindOneEl);    
+            var currentWindEl = document.createElement('div')
+            currentWindEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl")                                                                       
+            currentWindEl.textContent = currentWind;
+            currentCardEl.appendChild(currentWindEl);    
 
-            var forecastHumidityOneEl = document.createElement('div')
-            forecastHumidityOneEl.classList.add("forecast-bottom-rounded", "bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")                                                                       
-            forecastHumidityOneEl.textContent = forecastOneHummidity;
-            forecastCardOneEl.appendChild(forecastHumidityOneEl);
-            
-            var forecastiValueOneEl = document.createElement('div')
-            forecastiValueOneEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl", "p-1", "my-2")                                                                       
-            forecastiValueOneEl.textContent = `i = ${i}`;
-            forecastCardOneEl.appendChild(forecastiValueOneEl);     
-    };
+            var currentHummidityEl = document.createElement('div')
+            currentHummidityEl.classList.add("forecast-bottom-rounded", "bg-blue-200", "w-4/5", "text-center", "text-xl", "p-1", "mb-2")                                                                       
+            currentHummidityEl.textContent = currentHummidity;
+            currentCardEl.appendChild(currentHummidityEl);
+   
 
-
-//- Render remaining cards -//
+//- Render remaining forecast cards -//
 
     for (let i = 1; i < forecastDataArray.list.length; i = i+1) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
     
@@ -605,7 +730,6 @@ var displayForecast = () => {
     renderHistoryButtons();         // Refresh the history buttons    
     return;
 };
-
 
 //-------------------------------------//
 //- Function - Render history buttons -//
