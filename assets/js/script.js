@@ -238,8 +238,8 @@ var manipulateData = () => {
     console.log("  subsetArray:\n  ------------");
     console.log(subsetArray);
 
-    console.log ("  forecastDataArray: \n  ------------------")       
-    console.log(forecastDataArray)
+    // console.log ("  forecastDataArray: \n  ------------------")       
+    // console.log(forecastDataArray)
     
     //generate array of unique dates to carry out further data manipulation //declare and clear uniqueDateArray
     var uniqueDateArray = {
@@ -256,11 +256,11 @@ var manipulateData = () => {
         let testDate = uniqueDateArray.date.indexOf(subsetArray[j].date)
         if (testDate === parseInt(-1)) {
             uniqueDateArray.date.push(subsetArray[j].date)
-            console.log("  New unique date, adding to uniqueDateArray")
-            console.log(uniqueDateArray);
+            // console.log("  New unique date, adding to uniqueDateArray")
+            // console.log(uniqueDateArray);
         
         } else {
-            console.log("  " + subsetArray[j].date + " already appears in uniqueDate - not adding")
+            // console.log("  " + subsetArray[j].date + " already appears in uniqueDate - not adding")
             }
     }
     
@@ -269,71 +269,159 @@ var manipulateData = () => {
 
         if (subsetArray[k].date === uniqueDateArray.date[0]) {
             uniqueDateArray.day0.push(subsetArray[k])
-            console.log("push 0")
+            // console.log("push 0")
         } else
 
         if (subsetArray[k].date === uniqueDateArray.date[1]) {
             uniqueDateArray.day1.push(subsetArray[k])
-            console.log("push 1")
+            // console.log("push 1")
         } else
 
         if (subsetArray[k].date === uniqueDateArray.date[2]) {
             uniqueDateArray.day2.push(subsetArray[k])
-            console.log("push 2")
+            // console.log("push 2")
         } else
 
         if (subsetArray[k].date === uniqueDateArray.date[3]) {
             uniqueDateArray.day3.push(subsetArray[k])
-            console.log("push 3")
+            // console.log("push 3")
         } else
 
         if (subsetArray[k].date === uniqueDateArray.date[4]) {
             uniqueDateArray.day4.push(subsetArray[k])
-            console.log("push 4")
+            // console.log("push 4")
         } else
 
         if (subsetArray[k].date === uniqueDateArray.date[5]) {
             uniqueDateArray.day5.push(subsetArray[k])
-            console.log("push 5")
+            // console.log("push 5")
         } else {
-            console.log("not pushing")
+            // console.log("not pushing")
         }
     }
+    console.log ("  uniqueDateArray: \n  ----------------")   
     console.log(uniqueDateArray)
 
-    // //Filter for dates matching Day 1
-    // let dayOne = subsetArray.filter (subsetArray => subsetArray.date === uniqueDateArray.date[0])
-    // console.log(dayOne)
+    //------------------------------------------------------//
+    //- Max and Minum Temperature - day[no]Max / day[no]Min-//
+    //------------------------------------------------------//
 
-    //Day 0 Max Temp
-    let sortDay0Max = uniqueDateArray.day0
-    sortDay0Max.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Sort in descending (a greater than b if in sequence)
-    console.log(sortDay0Max)
-    var day0Max = uniqueDateArray.day0[0].tempMax
-    console.log("Day 0 Max Temp = " + day0Max)
+    //Day Zero Max Temp
+    let sortDayZeroMax = uniqueDateArray.day0;
+    sortDayZeroMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Sort in descending (a greater than b if in sequence)\
+    var dayZeroMax = uniqueDateArray.day0[0].tempMax;
+    console.log("Day ZERO Max Temp = " + dayZeroMax);
+    var dayZeroHumidity = uniqueDateArray.day0[0].humidity;
+    console.log("Day ZERO Humidity = " + dayZeroHumidity)
+    var dayZeroIcon = uniqueDateArray.day0[0].icon;
+    console.log("Day ZERO Icon = " + dayZeroIcon)
+    console.log(sortDayZeroMax);
 
-    //Day 0 Min Temp
-    let sortDay0Min = uniqueDateArray.day0
-    sortDay0Min.sort((a,b) => (a.tempMax > b.tempMax) ? 1 : (a.tempMax < b.tempMax) ?-1 : 0 );   // Sort in ascenmding (a less than b if in sequence)
-    console.log(sortDay0Min)
-    var day0Min = uniqueDateArray.day0[0].tempMin
-    console.log("Day 0 Min Temp = " + day0Min)
+    //Day Zero Min Temp
+    let sortDayZeroMin = uniqueDateArray.day0;
+    sortDayZeroMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 : 0 );   // Sort in ascenmding (a less than b if in sequence)
+    var dayZeroMin = uniqueDateArray.day0[0].tempMin;
+    console.log("Day ZERO Min Temp = " + dayZeroMin);
+    console.log(sortDayZeroMin);
 
-    //Day One Max Temp
-    let sortDayOneMax = uniqueDateArray.day1
+    //Day ONE Max Temp
+    let sortDayOneMax = uniqueDateArray.day1;
     sortDayOneMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
-    console.log(sortDayOneMax)    
-    var dayOneMax = uniqueDateArray.day1[0].tempMax
-    console.log("Day One Max Temp = " + dayOneMax)
+    var dayOneMax = uniqueDateArray.day1[0].tempMax;
+    console.log("Day ONE Max Temp = " + dayOneMax);
+    console.log(sortDayOneMax);    
 
-    // //Day One Min Temp
-    let sortDayOneMin = uniqueDateArray.day1
-    sortDayOneMin.sort((a,b) => (a.tempMax > b.tempMax) ? 1 : (a.tempMax < b.tempMax) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
-    console.log(sortDayOneMin)
-    var dayOneMin = uniqueDateArray.day1[0].tempMin
-    console.log("Day One Min Temp = " + dayOneMin)
+    // //Day ONE Min Temp
+    let sortDayOneMin = uniqueDateArray.day1;
+    sortDayOneMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
+    var dayOneMin = uniqueDateArray.day1[0].tempMin;
+    console.log("Day ONE Min Temp = " + dayOneMin);
+    console.log(sortDayOneMin);
 
-        
+    //Day TWO Max Temp
+    let sortDayTwoMax = uniqueDateArray.day2;
+    sortDayTwoMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
+    var dayTwoMax = uniqueDateArray.day2[0].tempMax;
+    console.log("Day TWO Max Temp = " + dayTwoMax); 
+    console.log(sortDayTwoMax);
+
+    //Day TWO Min Temp
+    let sortDayTwoMin = uniqueDateArray.day2;
+    sortDayTwoMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
+    var dayTwoMin = uniqueDateArray.day2[0].tempMin;
+    console.log("Day TWO Min Temp = " + dayTwoMin);
+    console.log(sortDayTwoMin);
+     
+    //Day THREE Max Temp
+    let sortDayThreeMax = uniqueDateArray.day3;
+    sortDayThreeMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
+    var dayThreeMax = uniqueDateArray.day3[0].tempMax;
+    console.log("Day THREE Max Temp = " + dayThreeMax); 
+    console.log(sortDayThreeMax);
+    
+    //Day THREE Min Temp
+    let sortDayThreeMin = uniqueDateArray.day3;
+    sortDayThreeMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
+    var dayThreeMin = uniqueDateArray.day3[0].tempMin;
+    console.log("Day THREE Min Temp = " + dayThreeMin);
+    console.log(sortDayThreeMin);
+
+    //Day FOUR Max Temp
+    let sortDayFourMax = uniqueDateArray.day4;
+    sortDayFourMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
+    var dayFourMax = uniqueDateArray.day4[0].tempMax;
+    console.log("Day FOUR Max Temp = " + dayFourMax); 
+    console.log(sortDayFourMax);
+    
+    //Day FOUR Min Temp
+    let sortDayFourMin = uniqueDateArray.day4;
+    sortDayFourMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
+    var dayFourMin = uniqueDateArray.day4[0].tempMin;
+    console.log("Day FOUR Min Temp = " + dayFourMin);
+    console.log(sortDayFourMin);
+
+    //Day FIVE Max Temp
+    let sortDayFiveMax = uniqueDateArray.day5;
+    sortDayFiveMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
+    var dayFiveMax = uniqueDateArray.day5[0].tempMax;
+    console.log("Day FIVE Max Temp = " + dayFiveMax); 
+    console.log(sortDayFiveMax);
+    
+    //Day FIVE Min Temp
+    let sortDayFiveMin = uniqueDateArray.day5;
+    sortDayFiveMin.sort((a,b) => (a.tempMin > b.tempMin) ? 1 : (a.tempMin < b.tempMin) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
+    var dayFiveMin = uniqueDateArray.day5[0].tempMin;
+    console.log("Day FIVE Min Temp = " + dayFiveMin);
+    console.log(sortDayFiveMin);
+
+    //-----------------------------//
+    //- Max Wind - day[no]MaxWind -//
+    //-----------------------------//
+
+        //Day ZERO Max Wind
+        let sortDayZeroMaxWind = uniqueDateArray.day0;
+        sortDayZeroMaxWind.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
+        var dayZeroMaxWind = uniqueDateArray.day0[0].wind;
+        console.log("Day ZERO Max Wind = " + dayZeroMaxWind); 
+        console.log(sortDayZeroMaxWind);
+
+
+
+
+
+
+    //Day FIVE Max Wind
+    let sortDayFiveMaxWind = uniqueDateArray.day5;
+    sortDayFiveMaxWind.sort((a,b) => (a.wind < b.wind) ? 1 : (a.wind > b.wind) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
+    var dayFiveMaxWind = uniqueDateArray.day5[0].wind;
+    console.log("Day FIVE Max Wind = " + dayFiveMaxWind); 
+    console.log(sortDayFiveMaxWind);
+
+    //----------------//
+    //- Max Humidity -//
+    //----------------//
+
+
     // Openweather array - values of interest
     // Date = forecastDataArray.list[i].dt
     // Temp = forecastDataArray.list[i].main.temp + "\xB0 C";
@@ -343,6 +431,37 @@ var manipulateData = () => {
     // Hummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
     // Icon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"  
     //day1Array[i].date = "19/10/2023"  // This works to replace values! (store "19/10/2023 in day1Array[i].date")
+
+    // define al the variables and create a final array
+
+var arrayForRendering = 
+    {"index": [ 
+        {"date": ""},
+        {"iconURL": ""},
+        {"maxTemp": ""},
+        {"minTemp": ""},
+        {"maxWind": ""},
+        {"maxHumidity": ""}
+    ]};
+
+//Up to here - difficulty building the array //
+// console.log(uniqueDateArray.date[0])
+// console.log(arrayForRendering)
+
+//Build array - Day 0
+    arrayForRendering.index[0].date = uniqueDateArray.date[0]
+    arrayForRendering.index[0].icon = dayZeroIcon
+    arrayForRendering.index[0].maxTemp = "Max: " + dayZeroMax + "\xB0 C"
+    arrayForRendering.index[0].minTemp = "Min: " + dayZeroMin + "\xB0 C"
+    arrayForRendering.index[0].humidity = dayZeroHumidity + "%"
+    arrayForRendering.index[0].wind = dayZeroMaxWind + "%"
+
+
+
+
+    
+    console.log ("  arrayForRendering: \n  ----------------")   
+    console.log (arrayForRendering)
 
     displayForecast(); 
     return;
