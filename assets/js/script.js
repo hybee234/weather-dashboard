@@ -214,17 +214,14 @@ var manipulateData = () => {
 //  AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('ddd, D/M/YYYY, HH:mm:ss A') // Declare var AEDT store date/time convert from Unix to AEDT, set hour, min, sec, ms to zero
 
     // Declare subsetArray (Javascript Object) - subsetArray storing subset of data from forecastDataArray for use of this page (forecastDataArray contains API data)
-
     var subsetArray = [
         // {"date":"17/10/2023", "temp":"23.4", "tempMin":"11.0", "tempMax":"28.0", "wind":"7", "humidity":"60"},
         // {"date":"18/10/2023", "temp":"25.5", "tempMin":"12.0", "tempMax":"30.0", "wind":"8", "humidity":"65"},
         // {"date":"18/10/2023", "temp":"25.5", "tempMin":"12.0", "tempMax":"30.0", "wind":"8", "humidity":"65"},
     ];
   
-    // POpulate subsetArray with Data
+    // Populate subsetArray with Data 
     for (let i=0; i< forecastDataArray.list.length; i = i+1) {
-        //day1Array[i].date = "19/10/2023"  // This works to replace values! (store "19/10/2023 in day1Array[i].date")
-
         subsetArray.push(
             {
             "date": ((dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')),
@@ -237,8 +234,105 @@ var manipulateData = () => {
             }
         )
     };
+
     console.log("  subsetArray:\n  ------------");
     console.log(subsetArray);
+
+    console.log ("  forecastDataArray: \n  ------------------")       
+    console.log(forecastDataArray)
+    
+    //generate array of unique dates to carry out further data manipulation //declare and clear uniqueDateArray
+    var uniqueDateArray = {
+        "date": [],
+        "day0": [],
+        "day1": [],
+        "day2": [],
+        "day3": [],
+        "day4": [],
+        "day5": []
+    };  
+
+    for (let j = 0; j < subsetArray.length;j++) {
+        let testDate = uniqueDateArray.date.indexOf(subsetArray[j].date)
+        if (testDate === parseInt(-1)) {
+            uniqueDateArray.date.push(subsetArray[j].date)
+            console.log("  New unique date, adding to uniqueDateArray")
+            console.log(uniqueDateArray);
+        
+        } else {
+            console.log("  " + subsetArray[j].date + " already appears in uniqueDate - not adding")
+            }
+    }
+    
+    //push values into respactive days in uniqueDateArray
+    for (let k = 0; k < subsetArray.length; k = k+1) {
+
+        if (subsetArray[k].date === uniqueDateArray.date[0]) {
+            uniqueDateArray.day0.push(subsetArray[k])
+            console.log("push 0")
+        } else
+
+        if (subsetArray[k].date === uniqueDateArray.date[1]) {
+            uniqueDateArray.day1.push(subsetArray[k])
+            console.log("push 1")
+        } else
+
+        if (subsetArray[k].date === uniqueDateArray.date[2]) {
+            uniqueDateArray.day2.push(subsetArray[k])
+            console.log("push 2")
+        } else
+
+        if (subsetArray[k].date === uniqueDateArray.date[3]) {
+            uniqueDateArray.day3.push(subsetArray[k])
+            console.log("push 3")
+        } else
+
+        if (subsetArray[k].date === uniqueDateArray.date[4]) {
+            uniqueDateArray.day4.push(subsetArray[k])
+            console.log("push 4")
+        } else
+
+        if (subsetArray[k].date === uniqueDateArray.date[5]) {
+            uniqueDateArray.day5.push(subsetArray[k])
+            console.log("push 5")
+        } else {
+            console.log("not pushing")
+        }
+    }
+    console.log(uniqueDateArray)
+
+    // //Filter for dates matching Day 1
+    // let dayOne = subsetArray.filter (subsetArray => subsetArray.date === uniqueDateArray.date[0])
+    // console.log(dayOne)
+
+    //Day 0 Max Temp
+    let sortDay0Max = uniqueDateArray.day0
+    sortDay0Max.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 : 0 );   // Sort in descending (a greater than b if in sequence)
+    console.log(sortDay0Max)
+    var day0Max = uniqueDateArray.day0[0].tempMax
+    console.log("Day 0 Max Temp = " + day0Max)
+
+    //Day 0 Min Temp
+    let sortDay0Min = uniqueDateArray.day0
+    sortDay0Min.sort((a,b) => (a.tempMax > b.tempMax) ? 1 : (a.tempMax < b.tempMax) ?-1 : 0 );   // Sort in ascenmding (a less than b if in sequence)
+    console.log(sortDay0Min)
+    var day0Min = uniqueDateArray.day0[0].tempMin
+    console.log("Day 0 Min Temp = " + day0Min)
+
+    //Day One Max Temp
+    let sortDayOneMax = uniqueDateArray.day1
+    sortDayOneMax.sort((a,b) => (a.tempMax < b.tempMax) ? 1 : (a.tempMax > b.tempMax) ?-1 :0 );   // Sort in descending (a greater than b if in sequence)
+    console.log(sortDayOneMax)    
+    var dayOneMax = uniqueDateArray.day1[0].tempMax
+    console.log("Day One Max Temp = " + dayOneMax)
+
+    // //Day One Min Temp
+    let sortDayOneMin = uniqueDateArray.day1
+    sortDayOneMin.sort((a,b) => (a.tempMax > b.tempMax) ? 1 : (a.tempMax < b.tempMax) ?-1 :0 );   // Sort in ascending (a less than b if in sequence)
+    console.log(sortDayOneMin)
+    var dayOneMin = uniqueDateArray.day1[0].tempMin
+    console.log("Day One Min Temp = " + dayOneMin)
+
         
     // Openweather array - values of interest
     // Date = forecastDataArray.list[i].dt
@@ -247,10 +341,8 @@ var manipulateData = () => {
     // MaxTemp = "High: " + forecastDataArray.list[i].main.temp_max + "\xB0 C";
     // Wind = "Wind: " + forecastDataArray.list[i].wind.speed + " km/hr";
     // Hummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
-    // Icon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
-
-    console.log ("  forecastDataArray: \n  ------------------")       
-    console.log(forecastDataArray)
+    // Icon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"  
+    //day1Array[i].date = "19/10/2023"  // This works to replace values! (store "19/10/2023 in day1Array[i].date")
 
     displayForecast(); 
     return;
