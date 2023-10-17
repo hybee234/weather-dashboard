@@ -5,3 +5,20 @@
 * {
     font-size: 16px;
 }
+
+
+/*Flex-wrap here, tailwind doesn't manage flex basis well*/
+.forecast-card {
+flex: 1 1 200px;
+
+}
+
+/*Round top corners of forecast cards - shaded part*/
+.forecast-top-rounded {
+    border-radius: 10px 10px 0px 0px
+}
+
+/*Round bottom corners of forecast cards shaded part*/
+.forecast-bottom-rounded {
+    border-radius: 0px 0px 10px 10px
+}

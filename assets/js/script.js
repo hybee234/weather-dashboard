@@ -3,18 +3,19 @@ const languageButtonsEl = document.querySelector('#language-buttons'); //buttons
 const searchInputEl = document.querySelector('#search-field');
 
 const forecastOneEl = document.getElementById('forecast-one')
-const forecastContainerEl = document.querySelector('#forecast-container');
+const forecastContainerEl = document.getElementById('forecast-container');  // Forecast cards beyond first one dynamically appending to this
 
 const locationSpanEl = document.querySelector('#location-display'); // name that comes after "weather forecaast for:"
 const modalEl =  document.getElementById('modal');                                    // Modal Window
 const modalTitleEl = document.getElementById('modal-title');                         // Modal Title Text
 const modalLineOneEl = document.getElementById('modal-line-one');                    // Modal Pragraph line one
 const modalLineTwoEl = document.getElementById('modal-line-two');                    // Modal Pragraph line two
-const modalOKBtn = document.getElementById('modal-ok')                               // Modal OK button
-const modalCloseBtn = document.getElementById('modal-close')                         // Modal Close button (cross)
-const previousSearchContainerEl = document.getElementById('prev-search-cont')                    // Container for previous search
-const previousSearchButtonContainerEl = document.getElementById('prev-search-button-container')  //Container for previous search buttons
-const clearHistoryBtn = document.getElementById('clear-history')                        //Container for previous search buttons
+const modalOKBtn = document.getElementById('modal-ok');                               // Modal OK button
+const modalCloseBtn = document.getElementById('modal-close');                         // Modal Close button (cross)
+const previousSearchContainerEl = document.getElementById('prev-search-cont');                    // Container for previous search
+const previousSearchButtonContainerEl = document.getElementById('prev-search-button-container');  //Container for previous search buttons
+const clearHistoryBtn = document.getElementById('clear-history');                        //Container for previous search buttons
+const footerTextEl = document.getElementById('footer-text');                            // Text at the bottom of footer
 
 const apiKey = "ebe9a8cb2cc6f41abc680b652e9804b6";
 var lat = "-37.81373321550253";                   // latitude to be populated by co-ordinate API (Default is Melbourne)
@@ -209,44 +210,47 @@ var retrieveStorage = () => {
 //------------------------------//
 var manipulateData = () => {
     console.log("\n\n\n > manipulateData() Called")
-    console.log ("Before manipulation")
-    console.log (forecastDataArray)
 
-    // date
+//  AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('ddd, D/M/YYYY, HH:mm:ss A') // Declare var AEDT store date/time convert from Unix to AEDT, set hour, min, sec, ms to zero
 
-     for (let i=0; i< forecastDataArray.list.length; i = i+1) {
-      //  var AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // Declare var AEDT store date/time convert from Unix to AEDT
-      //  AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('ddd, D/M/YYYY, HH:mm:ss A')
-        AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')
-    //     //AEDT = dayjs.unix(forecastDataArray.list[i].dt).format('ddd, D/M/YYYY, HH:mm:ss A');   // Declare var AEDT store date/time convert from Unix to AEDT
-       
-        console.log(AEDT)
-    //     forecastDataArray.list[i].dt = AEDT    //update object array to match AEDT rounded date/time
+    // Declare subsetArray (Javascript Object) - subsetArray storing subset of data from forecastDataArray for use of this page (forecastDataArray contains API data)
+
+    var subsetArray = [
+        // {"date":"17/10/2023", "temp":"23.4", "tempMin":"11.0", "tempMax":"28.0", "wind":"7", "humidity":"60"},
+        // {"date":"18/10/2023", "temp":"25.5", "tempMin":"12.0", "tempMax":"30.0", "wind":"8", "humidity":"65"},
+        // {"date":"18/10/2023", "temp":"25.5", "tempMin":"12.0", "tempMax":"30.0", "wind":"8", "humidity":"65"},
+    ];
+  
+    // POpulate subsetArray with Data
+    for (let i=0; i< forecastDataArray.list.length; i = i+1) {
+        //day1Array[i].date = "19/10/2023"  // This works to replace values! (store "19/10/2023 in day1Array[i].date")
+
+        subsetArray.push(
+            {
+            "date": ((dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')),
+            "temp": forecastDataArray.list[i].main.temp,
+            "tempMin": forecastDataArray.list[i].main.temp_min,
+            "tempMax": forecastDataArray.list[i].main.temp_max,
+            "wind": "Wind: " + forecastDataArray.list[i].wind.speed + " km/hr",
+            "humidity": "Humidity: " + forecastDataArray.list[i].main.humidity + "%",
+            "icon": "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
+            }
+        )
+    };
+    console.log("  subsetArray:\n  ------------");
+    console.log(subsetArray);
         
-    //     console.log("forecastDataArray" + forecastDataArray.list[i].dt );
-        
-    //     // constDateArray = forecastDataArray(groupDate)
+    // Openweather array - values of interest
+    // Date = forecastDataArray.list[i].dt
+    // Temp = forecastDataArray.list[i].main.temp + "\xB0 C";
+    // MinTemp = "Min: " + forecastDataArray.list[i].main.temp_min + "\xB0 C";
+    // MaxTemp = "High: " + forecastDataArray.list[i].main.temp_max + "\xB0 C";
+    // Wind = "Wind: " + forecastDataArray.list[i].wind.speed + " km/hr";
+    // Hummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
+    // Icon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
 
-    //     //         function groupDate(date) {
-    //     //             return 
-    //     //         }
-
- }
-
- 
-// MinMax
-    
-        // console.log(forecastDataArray.list.main.temp.min)
-        // console.log(forecastDataArray.list.main.temp.max)
-    
-
-
-    console.log ("After manipulation")       
-      console.log(forecastDataArray)
-
-
-
-
+    console.log ("  forecastDataArray: \n  ------------------")       
+    console.log(forecastDataArray)
 
     displayForecast(); 
     return;
@@ -265,10 +269,13 @@ var displayForecast = () => {
     forecastOneEl.innerHTML = ""            // ForecastOne Container
     forecastContainerEl.innerHTML = ""      // Forecast Container
 
-    locationSpanEl.textContent = "Lat/Lon:   " + lat + ", " + lon;  //used in subtitle   
+    footerTextEl.textContent = `Latitude: ${lat}, Longitute ${lon}`;  // Show Latitidue/Longitude in footer 
     console.log("  coordDataArray[0] values\n  ------------------------\n  Lat: " + coordDataArray[0].lat + "\n  Lon: " + coordDataArray[0].lon + "\n  Country: " + countryAPI + "\n  Name: " + nameAPI + "\n  State: " + stateAPI);
   
+    //- Render first card -//
     for (let i=0; i<1 ; i=i+1) {
+
+    AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')
 
     var forecastOneCity = nameAPI + ", " + stateAPI + ", " + countryAPI 
     var forecastOneDate = AEDT;
@@ -279,51 +286,57 @@ var displayForecast = () => {
     var forecastOneHummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
     var forecastOneIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
 
-        var forecastCardOneEl = document.createElement('li');                                                                                             
-        forecastCardOneEl.classList.add ("bg-blue-100", "forecast-container", "border-2", "rounded-xl", "flex", "flex-wrap");
-        forecastCardOneEl.textContent = "i = " + i;       
+        var forecastCardOneEl = document.createElement('div');
+        forecastCardOneEl.classList.add ("flex", "flex-wrap", "justify-center", "shrink", "grow")                                                                                        
         forecastOneEl.appendChild(forecastCardOneEl);                                                                                                 
 
             var forecastDateOneEl = document.createElement('div')
-            forecastDateOneEl.classList.add("bg-blue-100", "w-full", "font-bold", "text-left", "text-3xl", "p-2", "text-center")                                                                       
+            forecastDateOneEl.classList.add("bg-blue-100", "font-bold", "text-left", "text-3xl", "p-2", "text-center", "items-center", "justify-center", "flex", "flex-wrap", "grow", "shrink")                                                                       
             forecastDateOneEl.textContent = forecastOneCity + " (" + forecastOneDate  + ")"
             forecastCardOneEl.appendChild(forecastDateOneEl);                                                                                          
 
             var forecastIconOneEl = document.createElement('div')
-            forecastIconOneEl.classList.add("bg-blue-100", "w-full", "pl-8", "flex", "justify-center", "text-center")
-            forecastCardOneEl.appendChild(forecastIconOneEl);                                                                                          
+            forecastIconOneEl.classList.add("bg-blue-100", "flex", "justify-center", "text-center", "items-center", "w-4/5")
+            forecastDateOneEl.appendChild(forecastIconOneEl);                                                                                          
 
                 var forecastIconOneLink = document.createElement('img')
-                forecastIconOneLink.classList.add("bg-blue-300", "text-left", "object-fill", "text-align", "w-36")                                                                       
+                forecastIconOneLink.classList.add("bg-blue-300", "text-center", "object-fill", "w-24", "items-center")                                                                       
                 forecastIconOneLink.src = forecastOneIcon;                
                 forecastIconOneEl.appendChild(forecastIconOneLink);     
 
             var forecastTempOneEl = document.createElement('div')
-            forecastTempOneEl.classList.add("bg-blue-100", "w-full", "text-left", "text-xl", "p-2")
+            forecastTempOneEl.classList.add("forecast-top-rounded", "bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")
             forecastTempOneEl.textContent = "Temp: " + forecastOneTemp            
             forecastCardOneEl.appendChild(forecastTempOneEl);    
            
-
             var forecastTempHighLowOneEl = document.createElement('div')
-            forecastTempHighLowOneEl.classList.add("bg-blue-100", "w-full", "text-left", "text-xl", "p-2")                                                                       
+            forecastTempHighLowOneEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")                                                                       
             forecastTempHighLowOneEl.textContent = `${forecastOneMinTemp} / ${forecastOneMaxTemp}`
             forecastCardOneEl.appendChild(forecastTempHighLowOneEl);    
 
             var forecastWindOneEl = document.createElement('div')
-            forecastWindOneEl.classList.add("bg-blue-100", "w-full", "text-left", "text-xl", "p-2")                                                                       
+            forecastWindOneEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")                                                                       
             forecastWindOneEl.textContent = forecastOneWind;
             forecastCardOneEl.appendChild(forecastWindOneEl);    
 
             var forecastHumidityOneEl = document.createElement('div')
-            forecastHumidityOneEl.classList.add("bg-blue-100", "w-full", "text-left", "text-xl", "p-2")                                                                       
+            forecastHumidityOneEl.classList.add("forecast-bottom-rounded", "bg-blue-200", "w-4/5", "text-center", "text-xl", "p-2")                                                                       
             forecastHumidityOneEl.textContent = forecastOneHummidity;
-            forecastCardOneEl.appendChild(forecastHumidityOneEl);        
+            forecastCardOneEl.appendChild(forecastHumidityOneEl);
+            
+            var forecastiValueOneEl = document.createElement('div')
+            forecastiValueOneEl.classList.add("bg-blue-200", "w-4/5", "text-center", "text-xl", "p-1", "my-2")                                                                       
+            forecastiValueOneEl.textContent = `i = ${i}`;
+            forecastCardOneEl.appendChild(forecastiValueOneEl);     
     };
 
 
+//- Render remaining cards -//
 
     for (let i = 1; i < forecastDataArray.list.length; i = i+1) {    //increment by 8 to retrieve the value from the same time each day (API provides 3 hourly forecasts)
-        
+    
+        AEDT = (dayjs.unix(forecastDataArray.list[i].dt).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond',0)).format('D/M/YYYY')
+
         var forecastCity = "City: " + forecastDataArray.city.name;
         var forecastDate = AEDT;
         var forecastTemp = forecastDataArray.list[i].main.temp + "\xB0 C";
@@ -331,19 +344,14 @@ var displayForecast = () => {
         var forecastMaxTemp = "High: " + forecastDataArray.list[i].main.temp_max + "\xB0 C";
         var forecastWind = "Wind: " + forecastDataArray.list[i].wind.speed + " km/hr";
         var forecastHummidity = "Humidity: " + forecastDataArray.list[i].main.humidity + "%";
-        var forecastIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
+        var forecastIcon = "https://openweathermap.org/img/w/" + forecastDataArray.list[i].weather[0].icon + ".png"
      
-        
-        //let forecastText = i+": " + forecastCity + ", " + forecastDate + ", " + forecastTemp + ", " + forecastMinTemp + ", " + forecastMaxTemp + ", " + forecastWind + ", " + forecastHummidity + ", " + forecastIcon;
-        //console.log(forecastText);
-
-        var forecastCardEl = document.createElement('li');                                                                                             
-        forecastCardEl.classList.add ("forecast-container", "rounded-xl", "flex", "flex-wrap", "bg-blue-100", "border-blue-300", "w-1/4", "justify-center", "border-2", "p-3"); //, ,
-        forecastCardEl.textContent = "i = " + i
+        var forecastCardEl = document.createElement('div');                                                                                             
+        forecastCardEl.classList.add ("forecast-card", "rounded-xl", "flex", "flex-wrap", "bg-blue-100", "border-blue-300", "w-1/4", "justify-center", "border-2", "p-1", "flex-in-css-stylesheet"); 
         forecastContainerEl.appendChild(forecastCardEl);                                                                                                 
-
+        
             var forecastDateEl = document.createElement('div')
-            forecastDateEl.classList.add("bg-blue-800", "w-full", "font-bold", "text-center", "text-blue-100", "p-2")                                                                       
+            forecastDateEl.classList.add("forecast-top-rounded", "bg-blue-800", "w-full", "font-bold", "text-center", "text-blue-100", "p-2")                                                                       
             forecastDateEl.textContent = forecastDate 
             forecastCardEl.appendChild(forecastDateEl);                                                                                          
 
@@ -357,30 +365,35 @@ var displayForecast = () => {
                 forecastIconEl.appendChild(forecastIconLink);     
 
             var forecastTempEl = document.createElement('div')
-            forecastTempEl.classList.add("bg-blue-800", "w-full", "text-center", "bg-blue-800", "text-blue-100", "p-2")
+            forecastTempEl.classList.add("bg-blue-800", "w-full", "text-center", "text-blue-100", "p-2")
             forecastTempEl.textContent = "Temp: " + forecastTemp            
             forecastCardEl.appendChild(forecastTempEl);    
            
 
             var forecastTempHighLowEl = document.createElement('div')
-            forecastTempHighLowEl.classList.add("bg-blue-800", "w-full", "text-center", "bg-blue-800", "text-blue-100", "p-2")                                                                       
+            forecastTempHighLowEl.classList.add("bg-blue-800", "w-full", "text-center", "text-blue-100", "p-2")                                                                       
             forecastTempHighLowEl.textContent = `${forecastMinTemp} / ${forecastMaxTemp}`
             forecastCardEl.appendChild(forecastTempHighLowEl);    
 
             var forecastWindEl = document.createElement('div')
-            forecastWindEl.classList.add("bg-blue-800", "w-full", "text-center", "bg-blue-800", "text-blue-100", "p-2")                                                                       
+            forecastWindEl.classList.add("bg-blue-800", "w-full", "text-center", "text-blue-100", "p-2")                                                                       
             forecastWindEl.textContent = forecastWind;
             forecastCardEl.appendChild(forecastWindEl);    
 
             var forecastHumidityEl = document.createElement('div')
-            forecastHumidityEl.classList.add("bg-blue-800", "w-full", "text-center", "bg-blue-800", "text-blue-100", "p-2")                                                                       
+            forecastHumidityEl.classList.add("forecast-bottom-rounded", "bg-blue-800", "w-full", "text-center", "text-blue-100", "p-2")                                                                       
             forecastHumidityEl.textContent = forecastHummidity;
-            forecastCardEl.appendChild(forecastHumidityEl);        
+            forecastCardEl.appendChild(forecastHumidityEl);   
+            
+            var forecastiValueEl = document.createElement('div')
+            forecastiValueEl.classList.add("bg-blue-500", "w-full", "text-center", "text-blue-100", "p-1", "mt-2")                                                                       
+            forecastiValueEl.textContent = `i = ${i}`;
+            forecastCardEl.appendChild(forecastiValueEl);             
+
     };
-    renderHistoryButtons();         //Update and show the history buttons    
+    renderHistoryButtons();         // Refresh the history buttons    
     return;
 };
-
 
 
 //-------------------------------------//
@@ -392,7 +405,7 @@ var displayForecast = () => {
 var renderHistoryButtons = () => {
     console.log("\n\n\n > renderHistoryButton() Called");  
     console.log (previousSearchArray)
-    previousSearchButtonContainerEl.innerHTML = ""    
+    previousSearchButtonContainerEl.innerHTML = ""                  // Clear History Buttons
     previousSearchContainerEl.style.visibility = "block"     
     for (let i=0; i < previousSearchArray.length; i++)
      {
