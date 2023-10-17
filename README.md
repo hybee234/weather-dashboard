@@ -1,8 +1,7 @@
 <a name="readme-top"></a>
 
-# weather-dashboard
+# Huber's Weather Dashboard
 
-Challenge 6 - Server Side APIs
 
 ## Description
 
