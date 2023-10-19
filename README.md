@@ -146,6 +146,7 @@ I hope this makes for easier review for anyone taking a closer look. Appreciate 
 * Validate that clicking on the buttons triggers an update on the dashboard to display information relevant to the city chosen
 * Validate that the history buttons persist even after closing the browser and returning to the website
 * Validate that clicking on the "clear history" button clears all history buttons
+* Validate that the history does not create another button if a city with the same name is already saved
 
 #### Responsive Design
 * Validate that the webpage has a responsive design and scales for different screensizes
