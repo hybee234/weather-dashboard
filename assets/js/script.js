@@ -1,9 +1,7 @@
 const searchFormEl = document.getElementById('search-form'); 
-const languageButtonsEl = document.getElementById('language-buttons'); //buttons to select JS, HTML, CSS
 const searchInputEl = document.getElementById('search-field');
 
 const currentWeatherContainerEl = document.getElementById('current-weather-container');         // Subtitle - heading for firecast one
-//const locationSpanEl = document.getElementById('location-display');                 // name that comes after "weather forecaast for:"
 const currentEl = document.getElementById('current-weather')
 const forecastContainerEl = document.getElementById('forecast-container');  // Forecast cards beyond first one dynamically appending to this
 
@@ -189,16 +187,16 @@ var submitStorage = () => {
 //---------------------------------------------------------------------//
 var retrieveStorage = () => {
     console.log("\n\n\n > retrieveStorage() Called")
-    let previousSearch = localStorage.getItem('locationforecast');                                // retrieve data from local storage ('key = recipes') - store as savedRecipes    
+    let previousSearch = localStorage.getItem('locationforecast');                                // retrieve data from local storage ('key = locationforecast') - store as previousSearch
     console.log("  PreviousSearch Array: " + previousSearch)           
-        if (previousSearch) {                                                                     // If savedRecipes is not null or undefined, then
-            previousSearchArray = JSON.parse(previousSearch);                                     // convert to JSON object and store as recipeArray
+        if (previousSearch) {                                                                     // If previousSearch is not null or undefined, then
+            previousSearchArray = JSON.parse(previousSearch);                                     // convert to JSON object and store as previousSearchArray
             console.log("  Retrieved (key = 'locationforecast'):");
             console.log("    previousSearchArray:\n    ------------");
             console.log(previousSearchArray);
-            renderHistoryButtons();                                                               // Run displayRecipes() to display them 
+            renderHistoryButtons();                                                               // Run renderHistoryButtons() to display them 
             return;
-        } else {                                                                                  // else if savedRecipes is null or undefined (i.e. no local storage)
+        } else {                                                                                  // else if previousSearch is null or undefined (i.e. no local storage)
             console.log("  locationforecast null or undefined");    
             renderHistoryButtons();      
         return;
@@ -505,13 +503,12 @@ var manipulateData = () => {
     console.log(`\n  uniqueDataArray.date.length <6, No data to render day 5`)
 };
 
-        //-------------------//
-        //- uniqueDateArray -//
-        //-------------------//
+        //---------------------//
+        //- arrayForRendering -//
+        //---------------------//
 
-// uniqueDateArray is populated by data from subsetArray
-// the purpose of uniqueDateArray is to store the data from subsetArray grouped by Date ("zero'd" or rounded down to 0000hrs)
-// data organised this way allows the use of sort methods to determine maximum and minimum values within a day
+// arrayForRendering is populated by data from uniqueDateArray
+// the purpose of arrayForRendering is to organise the data in uniqueDateArray in a way that suits a for loop to render the data onto the page 
 
 arrayForRendering =      
         {"index": [
@@ -610,7 +607,7 @@ var displayForecast = () => {
     var currentMinTemp = "Low: " + forecastDataArray.list[0].main.temp_min + "\xB0 C";
     var currentMaxTemp = "High: " + forecastDataArray.list[0].main.temp_max + "\xB0 C";
     var currentWind = "Wind: " + forecastDataArray.list[0].wind.speed + " km/hr";
-    var currentHummidity = "Humidity: " + forecastDataArray.list[0].main.humidity + "%";
+    var currentHumidity = "Humidity: " + forecastDataArray.list[0].main.humidity + "%";
     var currentIcon = "http://openweathermap.org/img/w/" + forecastDataArray.list[0].weather[0].icon + ".png"
     
         var currentWeatherTitleEl = document.createElement('h2');
@@ -657,10 +654,10 @@ var displayForecast = () => {
             currentWindEl.textContent = currentWind;
             currentCardEl.appendChild(currentWindEl);    
 
-            var currentHummidityEl = document.createElement('div')
-            currentHummidityEl.classList.add("forecast-bottom-rounded", "bg-blue-300", "w-4/5", "text-center", "text-xl", "p-1", "mb-1")                                                                       
-            currentHummidityEl.textContent = currentHummidity;
-            currentCardEl.appendChild(currentHummidityEl);
+            var currentHumidityEl = document.createElement('div')
+            currentHumidityEl.classList.add("forecast-bottom-rounded", "bg-blue-300", "w-4/5", "text-center", "text-xl", "p-1", "mb-1")                                                                       
+            currentHumidityEl.textContent = currentHumidity;
+            currentCardEl.appendChild(currentHumidityEl);
    
     //-----------------------------//
     //- Render Forecasted Weather -//
